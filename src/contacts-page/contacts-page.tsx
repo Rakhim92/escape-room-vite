@@ -28,7 +28,7 @@ const ContactsPage = ():JSX.Element => (
             <dt className="contacts__dt">Адрес</dt>
             <dd className="contacts__dd">
               <address className="contacts__address">Санкт-Петербург,
-                <br> Набережная реки Карповка, д 5П</br>
+                <br/> Набережная реки Карповка, д 5П
               </address>
             </dd>
           </div>

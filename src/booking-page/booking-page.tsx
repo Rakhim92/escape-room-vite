@@ -41,7 +41,7 @@ const BookingPage = ():JSX.Element => (
                 <span className="custom-radio__label">9:45</span>
               </label>
               <label className="custom-radio booking-form__date">
-                <input type="radio" id="today15h00m" name="date" checked value="today15h00m"/>
+                <input type="radio" id="today15h00m" name="date" defaultChecked value="today15h00m"/>
                 <span className="custom-radio__label">15:00</span>
               </label>
               <label className="custom-radio booking-form__date">
@@ -99,7 +99,7 @@ const BookingPage = ():JSX.Element => (
             <input type="number" id="person" name="person" placeholder="Количество участников"/>
           </div>
           <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--children">
-            <input type="checkbox" id="children" name="children" checked/>
+            <input type="checkbox" id="children" name="children" defaultChecked />
             <span className="custom-checkbox__icon">
               <svg width="20" height="17" aria-hidden="true">
                 <use xlinkHref="#icon-tick"/>
