@@ -3,7 +3,7 @@ enum AppRoute {
   Quest = '/quest',
   Contacts = '/contacts',
   Login = '/login',
-  Booking = '/booking',
+  Booking = '/quest/:id/booking',
   MyQuests = '/my-quests'
 }
 

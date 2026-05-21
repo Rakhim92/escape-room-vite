@@ -42,8 +42,19 @@ const App = ({quests, extendedQuests}: TAppProps) => (
                 extendedQuests = {extendedQuests}
               />
             }
-          />
+          >
+          </Route>
         </Route>
+        <Route
+          path={AppRoute.Booking}
+          element={
+            <PrivateRoute authorizationStatus={getAuthorizationStatus}>
+              <BookingPage
+                extendedQuests={extendedQuests}
+              />
+            </PrivateRoute>
+          }
+        />
         <Route
           path={AppRoute.Contacts}
           element={<ContactsPage/>}
@@ -56,14 +67,7 @@ const App = ({quests, extendedQuests}: TAppProps) => (
             </PublicRoute>
           }
         />
-        <Route
-          path={AppRoute.Booking}
-          element={
-            <PrivateRoute authorizationStatus={getAuthorizationStatus}>
-              <BookingPage/>
-            </PrivateRoute>
-          }
-        />
+
         <Route
           path={AppRoute.MyQuests}
           element={

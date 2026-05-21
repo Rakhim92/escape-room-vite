@@ -27,7 +27,7 @@ const QuestPage = ({extendedQuests}: TQuestsPage):JSX.Element => {
   if (!selectedQuest) {
     return <NotFoundPage />;
   }
-  const {title, coverImg, coverImgWebp, level, type, peopleMinMax, description} = selectedQuest;
+  const {title, coverImg, coverImgWebp, level, type, peopleMinMax, description, id} = selectedQuest;
   const [minPeople, maxPeople] = peopleMinMax;
 
   return (
@@ -67,7 +67,7 @@ const QuestPage = ({extendedQuests}: TQuestsPage):JSX.Element => {
           <p className="quest-page__description">{description}</p>
           <Link
             className="btn btn--accent btn--cta quest-page__btn"
-            to={`${AppRoute.Booking}/${selectedQuest.id}`} // Динамический переход на бронирование этого квеста
+            to={AppRoute.Booking.replace(':id', id)}
           >
             Забронировать
           </Link>
