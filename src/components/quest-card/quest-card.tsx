@@ -1,6 +1,6 @@
 import { TQuest } from '../../types';
 
-type QuestCardProps = {
+type TQuestCard = {
   quest: TQuest;
 };
 
@@ -10,7 +10,7 @@ const LevelLabel = {
   hard: 'Сложный',
 };
 
-const QuestCard = ({quest}: QuestCardProps):JSX.Element => {
+const QuestCard = ({quest}: TQuestCard):JSX.Element => {
   const { title, previewImg, previewImgWebp, level, peopleMinMax } = quest;
   const [minPeople, maxPeople] = peopleMinMax;
   return (

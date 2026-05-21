@@ -1,10 +1,17 @@
-import { quests } from '../../mocks/quests';
+import { TQuest } from '../../types';
 import QuestCard from './quest-card';
 
-const QuestsCardList = ():JSX.Element => (
+type TQuestsCardList = {
+  quests: TQuest[];
+}
+
+const QuestsCardList = ({quests}: TQuestsCardList):JSX.Element => (
   <div className="cards-grid">
     {quests.map((quest) => (
-      <QuestCard key={quest.id} quest={quest}/>
+      <QuestCard
+        key={quest.id}
+        quest={quest}
+      />
     ))}
   </div>
 );

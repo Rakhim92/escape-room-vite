@@ -1,7 +1,12 @@
 import QuestsCardList from '../../components/quest-card/quest-card-list';
+import { TQuest } from '../../types';
 import FilterForm from './components/filter-form';
 
-const MainPage = ():JSX.Element => (
+type TMainPage = {
+  quests: TQuest[];
+}
+
+const MainPage = ({quests}: TMainPage):JSX.Element => (
   <main className="page-content">
     <div className="container">
       <div className="page-content__title-wrapper">
@@ -13,7 +18,9 @@ const MainPage = ():JSX.Element => (
         <FilterForm/>
       </div>
       <h2 className="title visually-hidden">Выберите квест</h2>
-      <QuestsCardList/>
+      <QuestsCardList
+        quests = {quests}
+      />
     </div>
   </main>
 );

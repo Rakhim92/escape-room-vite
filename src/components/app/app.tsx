@@ -11,9 +11,14 @@ import MyQuests from '../../pages/my-quests/my-quests';
 import PrivateRoute from '../private-route/private-route';
 import PublicRoute from '../public-route/public-route';
 import NotFoundPage from '../../pages/not-found-page/not-found-page';
+import { TExtendedQuest, TQuest} from '../../types';
 
+type TAppProps = {
+  quests: TQuest[];
+  extendedQuests: TExtendedQuest[];
+}
 
-const App = () => (
+const App = ({quests, extendedQuests}: TAppProps) => (
   <BrowserRouter>
     <Routes>
       <Route
@@ -22,12 +27,23 @@ const App = () => (
       >
         <Route
           index
-          element={<MainPage/>}
+          element={
+            <MainPage
+              quests = {quests}
+            />
+          }
         />
         <Route
           path={AppRoute.Quest}
-          element={<QuestPage/>}
-        />
+        >
+          <Route path=":id"
+            element={
+              <QuestPage
+                extendedQuests = {extendedQuests}
+              />
+            }
+          />
+        </Route>
         <Route
           path={AppRoute.Contacts}
           element={<ContactsPage/>}
