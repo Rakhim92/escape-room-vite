@@ -13,7 +13,7 @@ enum AuthorizationStatus {
   Unknown = 'UNKNOWN',
 }
 
-const getAuthorizationStatus = AuthorizationStatus.NoAuth;
+const getAuthorizationStatus = AuthorizationStatus.Auth;
 
 const LEVEL = [
   {
