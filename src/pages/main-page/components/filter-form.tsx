@@ -1,4 +1,4 @@
-import { GENRE, LEVEL } from '../../const';
+import { GENRE, LEVEL } from '../../../const';
 
 type TFilter = {
   title: string;

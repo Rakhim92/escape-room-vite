@@ -7,6 +7,14 @@ enum AppRoute {
   MyQuests = '/my-quests'
 }
 
+enum AuthorizationStatus {
+  Auth = 'AUTH',
+  NoAuth = 'NO_AUTH',
+  Unknown = 'UNKNOWN',
+}
+
+const getAuthorizationStatus = AuthorizationStatus.NoAuth;
+
 const LEVEL = [
   {
     title: 'any',
@@ -59,5 +67,5 @@ const GENRE = [
   }
 ];
 
-export {AppRoute, GENRE, LEVEL};
+export {AppRoute, GENRE, LEVEL, AuthorizationStatus, getAuthorizationStatus};
 

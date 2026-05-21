@@ -1,4 +1,4 @@
-import QuestsCardList from '../components/quest-card/quest-card-list';
+import QuestsCardList from '../../components/quest-card/quest-card-list';
 import FilterForm from './components/filter-form';
 
 const MainPage = ():JSX.Element => (
