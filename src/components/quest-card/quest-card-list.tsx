@@ -1,8 +1,8 @@
-import { TQuest } from '../../types';
+import { TMyBooking, TQuest } from '../../types';
 import QuestCard from './quest-card';
 
 type TQuestsCardList = {
-  quests: TQuest[];
+  quests: TQuest[] | TMyBooking[];
 }
 
 const QuestsCardList = ({quests}: TQuestsCardList):JSX.Element => (

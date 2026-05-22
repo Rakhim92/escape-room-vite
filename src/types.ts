@@ -13,6 +13,16 @@ export type TMyBooking = {
   readonly quest: TQuest;
 };
 
+export type TQuest = {
+  id: string;
+  title: string;
+  previewImg: string;
+  previewImgWebp: string;
+  level: 'easy' | 'medium' | 'hard';
+  type: 'adventures' | 'horror' |'mystic'|'detective'|'sci-fi';
+  readonly peopleMinMax: [number, number]; // Кортеж из двух чисел [min, max]
+};
+
 export type TSlot = {
   time: string;
   isAvailable: boolean;
@@ -46,16 +56,6 @@ export type TCity = {
     longitude: number;
     zoom: number;
   };
-};
-
-export type TQuest = {
-  id: string;
-  title: string;
-  previewImg: string;
-  previewImgWebp: string;
-  level: 'easy' | 'medium' | 'hard';
-  type: 'adventures' | 'horror' |'mystic'|'detective'|'sci-fi';
-  readonly peopleMinMax: [number, number]; // Кортеж из двух чисел [min, max]
 };
 
 export type TExtendedQuest = {
