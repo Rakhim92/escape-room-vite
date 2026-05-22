@@ -1,3 +1,20 @@
+export type TSlot = {
+  time: string;
+  isAvailable: boolean;
+};
+
+export type TBookingLocation = {
+  id: string;
+  location: {
+    address: string;
+    coords: readonly [number, number]; // Строгий кортеж [широта, долгота]
+  };
+  slots: {
+    today: TSlot[];
+    tomorrow: TSlot[];
+  };
+};
+
 export type TQuest = {
   id: string;
   title: string;

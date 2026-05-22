@@ -2,11 +2,12 @@ import { ReactElement, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import leaflet from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { TExtendedQuest } from '../../types';
+import { TBookingLocation, TExtendedQuest } from '../../types';
 import NotFoundPage from '../not-found-page/not-found-page';
 
 type TBookingPageProps = {
-  readonly extendedQuests: readonly TExtendedQuest[]; // Фикс: добавили readonly под as const
+  extendedQuests: TExtendedQuest[];
+  bookingLocations: TBookingLocation[];
 };
 
 // Координаты для карты (центральный офис/филиал)
@@ -16,7 +17,7 @@ const MAP_CENTER = {
   zoom: 16,
 };
 
-const BookingPage = ({ extendedQuests }: TBookingPageProps): ReactElement => {
+const BookingPage = ({ extendedQuests, bookingLocations }: TBookingPageProps): ReactElement => {
   const params = useParams<{ id: string }>(); // Вытаскиваем id из родительского роута квеста
   const mapRef = useRef<HTMLDivElement | null>(null);
 

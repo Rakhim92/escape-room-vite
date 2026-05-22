@@ -11,14 +11,15 @@ import MyQuests from '../../pages/my-quests/my-quests';
 import PrivateRoute from '../private-route/private-route';
 import PublicRoute from '../public-route/public-route';
 import NotFoundPage from '../../pages/not-found-page/not-found-page';
-import { TExtendedQuest, TQuest} from '../../types';
+import { TBookingLocation, TExtendedQuest, TQuest} from '../../types';
 
 type TAppProps = {
   quests: TQuest[];
   extendedQuests: TExtendedQuest[];
+  bookingLocations: TBookingLocation[];
 }
 
-const App = ({quests, extendedQuests}: TAppProps) => (
+const App = ({quests, extendedQuests, bookingLocations}: TAppProps) => (
   <BrowserRouter>
     <Routes>
       <Route
@@ -51,6 +52,7 @@ const App = ({quests, extendedQuests}: TAppProps) => (
             <PrivateRoute authorizationStatus={getAuthorizationStatus}>
               <BookingPage
                 extendedQuests={extendedQuests}
+                bookingLocations={bookingLocations}
               />
             </PrivateRoute>
           }
