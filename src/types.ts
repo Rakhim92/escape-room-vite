@@ -15,6 +15,15 @@ export type TBookingLocation = {
   };
 };
 
+export type TCompanyLocation = {
+  id: string;
+  name: string;
+  location: {
+    address: string;
+    coords: readonly [number, number];
+  };
+}
+
 export type TCity = {
   name: string;
   location: {

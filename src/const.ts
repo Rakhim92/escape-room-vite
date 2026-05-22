@@ -1,3 +1,5 @@
+import { TCity, TCompanyLocation } from './types';
+
 enum AppRoute {
   Root = '/',
   Quest = '/quest',
@@ -67,5 +69,25 @@ const GENRE = [
   }
 ];
 
-export {AppRoute, GENRE, LEVEL, AuthorizationStatus, getAuthorizationStatus};
+const SPETERBURG: TCity = {
+  name: 'Санкт-Петербург',
+  location: {
+    latitude: 59.9386,
+    longitude: 30.3141,
+    zoom: 10
+  }
+};
+
+const COMPANY_LOCATION: TCompanyLocation[] = [
+  {
+    id: 'Escape room',
+    name: 'Escape room',
+    location: {
+      address: 'Санкт-Петербург, Набережная реки Карповка, д 5П',
+      coords: [59.968322, 30.317359]
+    }
+  }
+];
+
+export {AppRoute, GENRE, LEVEL, AuthorizationStatus, getAuthorizationStatus, SPETERBURG, COMPANY_LOCATION};
 

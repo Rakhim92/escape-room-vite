@@ -2,20 +2,12 @@ import {useRef, useEffect} from 'react';
 import {Icon, Marker, layerGroup} from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import useMap from './use-map';
-import { TBookingLocation, TCity } from '../../types';
-
-const SPETERBURG: TCity = {
-  name: 'Санкт-Петербург',
-  location: {
-    latitude: 59.9386,
-    longitude: 30.3141,
-    zoom: 10
-  }
-};
+import { TBookingLocation, TCompanyLocation } from '../../types';
+import { SPETERBURG } from '../../const';
 
 export type MapProps = {
-  bookingLocations: TBookingLocation[];
-  activeLocation: TBookingLocation;
+  bookingLocations: TBookingLocation[] | TCompanyLocation[];
+  activeLocation: TBookingLocation | TCompanyLocation;
 };
 
 const defaultCustomIcon = new Icon({
