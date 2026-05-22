@@ -15,6 +15,15 @@ export type TBookingLocation = {
   };
 };
 
+export type TCity = {
+  name: string;
+  location: {
+    latitude: number;
+    longitude: number;
+    zoom: number;
+  };
+};
+
 export type TQuest = {
   id: string;
   title: string;

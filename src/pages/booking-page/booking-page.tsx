@@ -1,8 +1,7 @@
-import { ReactElement, useEffect, useRef } from 'react';
+import { ReactElement, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import leaflet from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 import { TBookingLocation, TExtendedQuest } from '../../types';
+import Map from '../../components/map/map';
 import NotFoundPage from '../not-found-page/not-found-page';
 
 type TBookingPageProps = {
@@ -10,57 +9,20 @@ type TBookingPageProps = {
   bookingLocations: TBookingLocation[];
 };
 
-// Координаты для карты (центральный офис/филиал)
-const MAP_CENTER = {
-  latitude: 59.968322,
-  longitude: 30.317559,
-  zoom: 16,
-};
-
 const BookingPage = ({ extendedQuests, bookingLocations }: TBookingPageProps): ReactElement => {
-  const params = useParams<{ id: string }>(); // Вытаскиваем id из родительского роута квеста
-  const mapRef = useRef<HTMLDivElement | null>(null);
-
+  const params = useParams<{ id: string }>();
   // Ищем выбранный квест в расширенном массиве данных
   const selectedQuest = extendedQuests.find((item) => item.id === params.id);
 
-  useEffect(() => {
-    let map: leaflet.Map | null = null;
+  // Храним ID выбранного филиала (по умолчанию — первый из списка)
+  const [activeLocationId, ] = useState<string>(
+    bookingLocations[0]?.id || ''
+  );
 
-    // Инициализация карты только если квест найден и DOM-контейнер готов
-    if (selectedQuest && mapRef.current && !mapRef.current.classList.contains('leaflet-container')) {
-      map = leaflet.map(mapRef.current, {
-        center: [MAP_CENTER.latitude, MAP_CENTER.longitude],
-        zoom: MAP_CENTER.zoom,
-      });
+  // Находим объект активной локации по её ID
+  const activeLocation = bookingLocations.find((loc) => loc.id === activeLocationId);
 
-      leaflet
-        .tileLayer('https://{s}://{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors &copy; <a href="https://carto.com">CARTO</a>',
-        })
-        .addTo(map);
-
-      const customIcon = leaflet.icon({
-        iconUrl: '/img/svg/pin-default.svg',
-        iconSize: [40, 40],
-        iconAnchor: [20, 40],
-      });
-
-      leaflet
-        .marker([MAP_CENTER.latitude, MAP_CENTER.longitude], { icon: customIcon })
-        .addTo(map);
-    }
-
-    // Сброс и уничтожение инстанса карты при размонтировании вложенного роута
-    return () => {
-      if (map) {
-        map.remove();
-      }
-    };
-  }, [selectedQuest]);
-
-  // Защита: если перешли на несуществующий /quest/невалидный-id/booking
-  if (!selectedQuest) {
+  if (!selectedQuest || !activeLocation) {
     return <NotFoundPage />;
   }
 
@@ -70,7 +32,6 @@ const BookingPage = ({ extendedQuests, bookingLocations }: TBookingPageProps): R
     <main className="page-content decorated-page">
       <div className="decorated-page__decor" aria-hidden="true">
         <picture>
-          {/* ИСПРАВЛЕНО: Динамический фон вложенного квеста со слэшем / от корня сайта */}
           <source type="image/webp" srcSet={`${coverImgWebp} 2x`} />
           <img
             src={coverImg}
@@ -84,72 +45,59 @@ const BookingPage = ({ extendedQuests, bookingLocations }: TBookingPageProps): R
       <div className="container container--size-s">
         <div className="page-content__title-wrapper">
           <h1 className="subtitle subtitle--size-l page-content__subtitle">Бронирование квеста</h1>
-          {/* ИСПРАВЛЕНО: Динамический вывод названия выбранного квеста */}
           <p className="title title--size-m title--uppercase page-content__title">{title}</p>
         </div>
         <div className="page-content__item">
           <div className="booking-map">
             <div className="map">
-              {/* ИСПРАВЛЕНО: Привязали ref для инициализации Leaflet */}
-              <div className="map__container" ref={mapRef} style={{ height: '100%' }}></div>
+              <Map
+                bookingLocations={bookingLocations}
+                activeLocation={activeLocation}
+              />
             </div>
-            <p className="booking-map__address">Вы&nbsp;выбрали: наб. реки Карповки&nbsp;5, лит&nbsp;П, м. Петроградская</p>
+            {/* Отображаем динамический адрес выбранного филиала */}
+            <p className="booking-map__address">Вы&nbsp;выбрали: {activeLocation.location.address}</p>
           </div>
         </div>
         <form className="booking-form" action="https://echo.htmlacademy.ru/" method="post">
           <fieldset className="booking-form__section">
             <legend className="visually-hidden">Выбор даты и времени</legend>
+            {/* Рендеринг слотов НА СЕГОДНЯ */}
             <fieldset className="booking-form__date-section">
               <legend className="booking-form__date-title">Сегодня</legend>
               <div className="booking-form__date-inner-wrapper">
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="today9h45m" name="date" value="today9h45m" />
-                  <span className="custom-radio__label">9:45</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="today15h00m" name="date" defaultChecked value="today15h00m" />
-                  <span className="custom-radio__label">15:00</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="today17h30m" name="date" value="today17h30m" />
-                  <span className="custom-radio__label">17:30</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="today19h30m" name="date" value="today19h30m" disabled />
-                  <span className="custom-radio__label">19:30</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="today21h30m" name="date" value="today21h30m" />
-                  <span className="custom-radio__label">21:30</span>
-                </label>
+                {activeLocation.slots.today.map((slot) => (
+                  <label className="custom-radio booking-form__date" key={`today-${slot.time}`}>
+                    <input
+                      type="radio"
+                      name="date"
+                      value={`today-${slot.time}`}
+                      disabled={!slot.isAvailable}
+                    />
+                    <span className="custom-radio__label">{slot.time}</span>
+                  </label>
+                ))}
               </div>
             </fieldset>
+            {/* Рендеринг слотов НА ЗАВТРА */}
             <fieldset className="booking-form__date-section">
               <legend className="booking-form__date-title">Завтра</legend>
               <div className="booking-form__date-inner-wrapper">
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="tomorrow11h00m" name="date" value="tomorrow11h00m" />
-                  <span className="custom-radio__label">11:00</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="tomorrow15h00m" name="date" value="tomorrow15h00m" disabled />
-                  <span className="custom-radio__label">15:00</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="tomorrow17h30m" name="date" value="tomorrow17h30m" disabled />
-                  <span className="custom-radio__label">17:30</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="tomorrow19h45m" name="date" value="tomorrow19h45m" />
-                  <span className="custom-radio__label">19:45</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="tomorrow21h30m" name="date" value="tomorrow21h30m" />
-                  <span className="custom-radio__label">21:30</span>
-                </label>
+                {activeLocation.slots.tomorrow.map((slot) => (
+                  <label className="custom-radio booking-form__date" key={`tomorrow-${slot.time}`}>
+                    <input
+                      type="radio"
+                      name="date"
+                      value={`tomorrow-${slot.time}`}
+                      disabled={!slot.isAvailable}
+                    />
+                    <span className="custom-radio__label">{slot.time}</span>
+                  </label>
+                ))}
               </div>
             </fieldset>
           </fieldset>
+
           <fieldset className="booking-form__section">
             <legend className="visually-hidden">Контактная информация</legend>
             <div className="custom-input booking-form__input">
@@ -179,7 +127,7 @@ const BookingPage = ({ extendedQuests, bookingLocations }: TBookingPageProps): R
             <input type="checkbox" id="id-order-agreement" name="user-agreement" required />
             <span className="custom-checkbox__icon">
               <svg width="20" height="17" aria-hidden="true">
-                <use href="#icon-tick" /> {/* Исправлено: href вместо xlinkHref */}
+                <use href="#icon-tick" />
               </svg>
             </span>
             <span className="custom-checkbox__label">Я&nbsp;согласен с{' '}

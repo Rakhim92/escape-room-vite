@@ -2,42 +2,57 @@ import {useRef, useEffect} from 'react';
 import {Icon, Marker, layerGroup} from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import useMap from './use-map';
+import { TBookingLocation, TCity } from '../../types';
+
+const SPETERBURG: TCity = {
+  name: 'Санкт-Петербург',
+  location: {
+    latitude: 59.9386,
+    longitude: 30.3141,
+    zoom: 10
+  }
+};
+
+export type MapProps = {
+  bookingLocations: TBookingLocation[];
+  activeLocation: TBookingLocation;
+};
 
 const defaultCustomIcon = new Icon({
-  iconUrl: 'img/pin.svg',
+  iconUrl: '/img/svg/pin-default.svg',
   iconSize: [27, 39],
   iconAnchor: [13.5, 39]
 });
 
 const currentCustomIcon = new Icon({
-  iconUrl: 'img/pin-active.svg',
+  iconUrl: '/img/svg/pin-active.svg',
   iconSize: [27, 39],
   iconAnchor: [13.5, 39]
 });
 
 function Map(props: MapProps): JSX.Element {
-  const {city, offers, selectedPoint} = props;
+  const {bookingLocations, activeLocation} = props;
 
   const mapRef = useRef(null);
-  const map = useMap(mapRef, city);
+  const map = useMap(mapRef, SPETERBURG);
 
   useEffect(() => {
     if (map) {
-      map.setView([city.location.latitude, city.location.longitude], city.location.zoom);
+      map.setView([SPETERBURG.location.latitude, SPETERBURG.location.longitude], SPETERBURG.location.zoom);
     }
-  }, [city, map]);
+  }, [map]);
 
   useEffect(() => {
-    if (map && offers) {
+    if (map && bookingLocations) {
       const markerLayer = layerGroup().addTo(map);
 
-      offers.forEach((offer) => {
+      bookingLocations.forEach((location) => {
         const marker = new Marker({
-          lat: offer.location.latitude,
-          lng: offer.location.longitude
+          lat: location.location.coords[0],
+          lng: location.location.coords[1]
         });
 
-        const isCurrent = !!selectedPoint && offer.id === selectedPoint.id;
+        const isCurrent = !!activeLocation && location.id === activeLocation.id;
 
         marker
           .setIcon(isCurrent ? currentCustomIcon : defaultCustomIcon)
@@ -48,9 +63,9 @@ function Map(props: MapProps): JSX.Element {
         map.removeLayer(markerLayer);
       };
     }
-  }, [map, offers, selectedPoint]);
+  }, [map, bookingLocations, activeLocation]);
 
-  return <section className={`${ClassNamesForMap} map`} ref={mapRef}/>;
+  return <div className='map__container' ref={mapRef}/>;
 }
 
 export default Map;
