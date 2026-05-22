@@ -1,3 +1,18 @@
+export type TMyBooking = {
+  id: string;
+  date: 'today' | 'tomorrow';
+  time: string;
+  contactPerson: string;
+  phone: string;
+  withChildren: boolean;
+  peopleCount: number;
+  location: {
+    address: string;
+    coords: readonly [number, number];
+  };
+  readonly quest: TQuest;
+};
+
 export type TSlot = {
   time: string;
   isAvailable: boolean;
