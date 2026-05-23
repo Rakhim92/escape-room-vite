@@ -1,5 +1,15 @@
 import { TCity, TCompanyLocation } from './types';
 
+enum APIRoute {
+  Quests = 'quest',
+  Booking = '/booking',
+  Reservation = 'reservation',
+  Login = '/login',
+  Logout = '/logout'
+}
+
+const USER_AUTH_DATA = 'user-auth-data';
+
 enum AppRoute {
   Root = '/',
   Quest = '/quest',
@@ -89,5 +99,5 @@ const COMPANY_LOCATION: TCompanyLocation[] = [
   }
 ];
 
-export {AppRoute, GENRE, LEVEL, AuthorizationStatus, getAuthorizationStatus, SPETERBURG, COMPANY_LOCATION};
+export {AppRoute, GENRE, LEVEL, AuthorizationStatus, getAuthorizationStatus, SPETERBURG, COMPANY_LOCATION, USER_AUTH_DATA, APIRoute};
 

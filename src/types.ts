@@ -1,3 +1,26 @@
+import {store} from './store/index';
+
+export type State = ReturnType<typeof store.getState>;
+
+export type AppDispatch = typeof store.dispatch;
+
+export type TDataProcess = {
+  quests: TQuest[];
+  isDataLoading: boolean;
+  myQuests: TMyBooking[];
+};
+
+export type UserData = {
+  id: number;
+  email: string;
+  token: string;
+};
+
+export type AuthData = {
+  login: string;
+  password: string;
+};
+
 export type TMyBooking = {
   id: string;
   date: 'today' | 'tomorrow';
@@ -8,9 +31,9 @@ export type TMyBooking = {
   peopleCount: number;
   location: {
     address: string;
-    coords: readonly [number, number];
+    coords: [number, number];
   };
-  readonly quest: TQuest;
+  quest: TQuest;
 };
 
 export type TQuest = {
@@ -20,7 +43,7 @@ export type TQuest = {
   previewImgWebp: string;
   level: 'easy' | 'medium' | 'hard';
   type: 'adventures' | 'horror' |'mystic'|'detective'|'sci-fi';
-  readonly peopleMinMax: [number, number]; // Кортеж из двух чисел [min, max]
+  peopleMinMax: [number, number];
 };
 
 export type TSlot = {
@@ -32,7 +55,7 @@ export type TBookingLocation = {
   id: string;
   location: {
     address: string;
-    coords: readonly [number, number]; // Строгий кортеж [широта, долгота]
+    coords: [number, number];
   };
   slots: {
     today: TSlot[];
@@ -45,7 +68,7 @@ export type TCompanyLocation = {
   name: string;
   location: {
     address: string;
-    coords: readonly [number, number];
+    coords: [number, number];
   };
 }
 
@@ -65,7 +88,7 @@ export type TExtendedQuest = {
   previewImgWebp: string;
   level: 'easy' | 'medium' | 'hard';
   type: 'adventures' | 'horror' |'mystic'|'detective'|'sci-fi';
-  readonly peopleMinMax: [number, number];
+  peopleMinMax: [number, number];
   description: string;
   coverImg: string;
   coverImgWebp: string;
