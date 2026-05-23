@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { TMyBooking, TQuest } from '../../types';
 import { AppRoute } from '../../const';
 import { isMyBooking } from '../../utils';
+import { useAppDispatch } from '../../hooks';
+import { deleteBookingAction } from '../../store/api-actions';
 
 type TQuestCard = {
   quest: TQuest | TMyBooking;
@@ -19,10 +21,18 @@ const TodayTomorrowTranslate = {
 };
 
 const QuestCard = ({quest}: TQuestCard):JSX.Element => {
+  const dispatch = useAppDispatch(); // Инициализируем dispatch
   // Проверяем, вложенный ли это квест (из TMyBooking) или прямой (из TQuest)
   const questData = isMyBooking(quest) ? quest.quest : quest;
   const { title, previewImg, previewImgWebp, level, peopleMinMax, id } = questData;
   const [minPeople, maxPeople] = peopleMinMax;
+  // Обработчик удаления бронирования
+  const handleDeleteClick = () => {
+    if (isMyBooking(quest)) {
+      // Передаем quest.id (это ID самой брони из TMyBooking)
+      dispatch(deleteBookingAction(quest.id));
+    }
+  };
   return (
     <div className="quest-card">
       <div className="quest-card__img">
@@ -76,6 +86,7 @@ const QuestCard = ({quest}: TQuestCard):JSX.Element => {
           <button
             className="btn btn--accent btn--secondary quest-card__btn"
             type="button"
+            onClick={handleDeleteClick}
           >Отменить
           </button>
         )}

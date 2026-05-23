@@ -1,20 +1,15 @@
 import { RootState } from '../index';
-import { TOffer, TOfferExtended, TComment } from '../../types';
+import { TMyBooking, TQuest } from '../../types';
 
-export const getOffers = (state: RootState): TOffer[] =>
-  state.DATA.offers;
+export const getQuests = (state: RootState): TQuest[] =>
+  state.DATA.quests;
 
-export const getIsOffersDataLoading = (state: RootState): boolean =>
-  state.DATA.isOffersDataLoading;
+export const getIsDataLoading = (state: RootState): boolean =>
+  state.DATA.isDataLoading;
 
-export const getCurrentOffer = (state: RootState): TOffer | TOfferExtended | null =>
-  state.DATA.currentOffer;
+// export const getCurrentOffer = (state: RootState): TOffer | TOfferExtended | null =>
+//   state.DATA.currentOffer;
 
-export const getFavorites = (state: RootState): TOffer[] =>
-  state.DATA.favorites;
+export const getMyQuests = (state: RootState): TMyBooking[] =>
+  state.DATA.myQuests as TMyBooking[];
 
-export const getComments = (state: RootState): TComment[] =>
-  state.DATA.comments;
-
-export const getOtherOffers = (state: RootState): TOffer[] =>
-  state.DATA.otherOffers;

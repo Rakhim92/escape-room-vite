@@ -1,22 +1,20 @@
 import {Link, NavLink, Outlet} from 'react-router-dom';
-import {AppRoute, AuthorizationStatus, getAuthorizationStatus} from '../../const';
-
-// const getLayoutState = (pathname: AppRoute) => {
-//   let shouldRenderLinkMyQuests = true;
-//   if (pathname === AppRoute.Quest
-//     || pathname === AppRoute.Login
-//     || pathname === AppRoute.Contacts) {
-//     shouldRenderLinkMyQuests = false;
-//   }
-
-//   return {shouldRenderLinkMyQuests};
-// };
-
+import {AppRoute, AuthorizationStatus} from '../../const';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { getAuthorizationStatus } from '../../store/user-process/user-process.selectors';
+import { logoutAction } from '../../store/api-actions'; // Импортируем созданный ранее экшен логаута
+import { MouseEvent } from 'react';
 
 const Layout = () => {
-  // const {pathname} = useLocation();
-  const isAuthorized = getAuthorizationStatus === AuthorizationStatus.Auth;
-  // const {shouldRenderLinkMyQuests} = getLayoutState(pathname as AppRoute);
+  const dispatch = useAppDispatch(); // Инициализируем dispatch
+  const authorizationStatus = useAppSelector(getAuthorizationStatus);
+  const isAuthorizated = authorizationStatus === AuthorizationStatus.Auth;
+
+  // Функция для обработки клика по кнопке Выйти
+  const handleLogoutClick = (evt: MouseEvent<HTMLAnchorElement>) => {
+    evt.preventDefault();
+    dispatch(logoutAction());
+  };
   return (
     <div className="wrapper">
       <header className="header">
@@ -47,7 +45,7 @@ const Layout = () => {
                 >Контакты
                 </NavLink>
               </li>
-              {getAuthorizationStatus === AuthorizationStatus.Auth ? (
+              {authorizationStatus === AuthorizationStatus.Auth ? (
                 <li className="main-nav__item">
                   <NavLink
                     className={({ isActive }) => `link ${isActive ? 'active' : ''}`}
@@ -59,11 +57,24 @@ const Layout = () => {
             </ul>
           </nav>
           <div className="header__side-nav">
-            <Link
-              className={`btn header__side-item ${isAuthorized ? 'btn--accent' : 'header__login-btn'}`}
-              to={AppRoute.Root}
-            >{isAuthorized ? 'Выйти' : 'Вход'}
-            </Link>
+            {isAuthorizated ? (
+              // Кнопка для авторизованного пользователя вызывает логаут
+              <a
+                className="btn header__side-item btn--accent"
+                href="#"
+                onClick={handleLogoutClick}
+              >
+                Выйти
+              </a>
+            ) : (
+              // Кнопка для гостя ведет на страницу логина (укажите ваш роут, например AppRoute.Login)
+              <Link
+                className="btn header__side-item header__login-btn"
+                to={AppRoute.Login || '/login'}
+              >
+                Вход
+              </Link>
+            )}
             <a
               className="link header__side-item header__phone-link"
               href="tel:88003335599"

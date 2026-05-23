@@ -1,6 +1,6 @@
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 // import browserHistory from '../../browser-history';
-import {AppRoute, getAuthorizationStatus} from '../../const';
+import {AppRoute} from '../../const';
 import Layout from '../layout/layout';
 import MainPage from '../../pages/main-page/main-page';
 import QuestPage from '../../pages/quest-page/quest-page';
@@ -12,6 +12,8 @@ import PrivateRoute from '../private-route/private-route';
 import PublicRoute from '../public-route/public-route';
 import NotFoundPage from '../../pages/not-found-page/not-found-page';
 import { TBookingLocation, TExtendedQuest, TMyBooking, TQuest} from '../../types';
+import { useAppSelector } from '../../hooks';
+import { getAuthorizationStatus } from '../../store/user-process/user-process.selectors';
 
 type TAppProps = {
   quests: TQuest[];
@@ -20,75 +22,78 @@ type TAppProps = {
   myBookingsData: TMyBooking[];
 }
 
-const App = ({quests, extendedQuests, bookingLocations, myBookingsData}: TAppProps) => (
-  <BrowserRouter>
-    <Routes>
-      <Route
-        path={AppRoute.Root}
-        element={<Layout/>}
-      >
+const App = ({quests, extendedQuests, bookingLocations, myBookingsData}: TAppProps) => {
+  const authorizationStatus = useAppSelector(getAuthorizationStatus);
+  return (
+    <BrowserRouter>
+      <Routes>
         <Route
-          index
-          element={
-            <MainPage
-              quests = {quests}
-            />
-          }
-        />
-        <Route
-          path={AppRoute.Quest}
+          path={AppRoute.Root}
+          element={<Layout/>}
         >
-          <Route path=":id"
+          <Route
+            index
             element={
-              <QuestPage
-                extendedQuests = {extendedQuests}
+              <MainPage
+                quests = {quests}
               />
             }
+          />
+          <Route
+            path={AppRoute.Quest}
           >
+            <Route path=":id"
+              element={
+                <QuestPage
+                  extendedQuests = {extendedQuests}
+                />
+              }
+            >
+            </Route>
           </Route>
-        </Route>
-        <Route
-          path={AppRoute.Booking}
-          element={
-            <PrivateRoute authorizationStatus={getAuthorizationStatus}>
-              <BookingPage
-                extendedQuests={extendedQuests}
-                bookingLocations={bookingLocations}
-              />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path={AppRoute.Contacts}
-          element={<ContactsPage/>}
-        />
-        <Route
-          path={AppRoute.Login}
-          element={
-            <PublicRoute authorizationStatus={getAuthorizationStatus}>
-              <LoginPage/>
-            </PublicRoute>
-          }
-        />
+          <Route
+            path={AppRoute.Booking}
+            element={
+              <PrivateRoute authorizationStatus={authorizationStatus}>
+                <BookingPage
+                  extendedQuests={extendedQuests}
+                  bookingLocations={bookingLocations}
+                />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path={AppRoute.Contacts}
+            element={<ContactsPage/>}
+          />
+          <Route
+            path={AppRoute.Login}
+            element={
+              <PublicRoute authorizationStatus={authorizationStatus}>
+                <LoginPage/>
+              </PublicRoute>
+            }
+          />
 
-        <Route
-          path={AppRoute.MyQuests}
-          element={
-            <PrivateRoute authorizationStatus={getAuthorizationStatus}>
-              <MyQuests
-                myBookingsData={myBookingsData}
-              />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path='*'
-          element={<NotFoundPage/>}
-        />
-      </Route>
-    </Routes>
-  </BrowserRouter>
-);
+          <Route
+            path={AppRoute.MyQuests}
+            element={
+              <PrivateRoute authorizationStatus={authorizationStatus}>
+                <MyQuests
+                  myBookingsData={myBookingsData}
+                />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path='*'
+            element={<NotFoundPage/>}
+          />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+};
 
 export default App;
 

@@ -1,9 +1,9 @@
 import {AxiosInstance} from 'axios';
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {TQuest, UserData, AuthData, AppDispatch, State} from '../types.ts';
+import {TQuest, UserData, AuthData, AppDispatch, State, TMyBooking} from '../types.ts';
 import { redirectToRoute} from './action';
 import {requireAuthorization, saveAuthInfo} from './user-process/user-process.ts';
-import {loadQuests, setLoadingStatus } from './data-process/data-process.ts';
+import {loadMyQuests, loadQuests, setLoadingStatus } from './data-process/data-process.ts';
 import {saveToken, dropToken} from '../services/token';
 import {APIRoute, AuthorizationStatus, AppRoute, USER_AUTH_DATA} from '../const';
 
@@ -68,16 +68,34 @@ export const logoutAction = createAsyncThunk<void, undefined, {
   },
 );
 
-// export const fetchFavoritesAction = createAsyncThunk<void, undefined, {
-//   dispatch: AppDispatch;
-//   state: State;
-//   extra: AxiosInstance;
-// }>(
-//   'data/fetchFavorites',
-//   async (_arg, {dispatch, extra: api}) => {
-//     dispatch(setOffersLoadingStatus(true));
-//     const {data} = await api.get<TOffer[]>(APIRoute.Favorite);
-//     dispatch(setOffersLoadingStatus(false));
-//     dispatch(loadFavorite(data));
-//   },
-// );
+// Получение списка забронированных квестов (Мои бронирования)
+export const fetchMyQuestsAction = createAsyncThunk<void, undefined, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'data/fetchMyQuests',
+  async (_arg, {dispatch, extra: api}) => {
+    dispatch(setLoadingStatus(true));
+    // Делаем запрос к эндпоинту бронирований (убедитесь, что APIRoute.Reservation правильный)
+    const {data} = await api.get<TMyBooking[]>(APIRoute.Reservation);
+    dispatch(setLoadingStatus(false));
+    dispatch(loadMyQuests(data));
+  },
+);
+
+// Удаление (отмена) бронирования
+export const deleteBookingAction = createAsyncThunk<string, string, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'data/deleteBooking',
+  async (bookingId, {extra: api}) => {
+    // Отправляем DELETE запрос на сервер с id бронирования
+    await api.delete(`${APIRoute.Reservation}/${bookingId}`);
+    // Возвращаем id удаленной брони, чтобы редьюсер отфильтровал её в стейте
+    return bookingId;
+  },
+);
+

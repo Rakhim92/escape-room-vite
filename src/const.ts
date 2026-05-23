@@ -25,8 +25,6 @@ enum AuthorizationStatus {
   Unknown = 'UNKNOWN',
 }
 
-const getAuthorizationStatus = AuthorizationStatus.Auth;
-
 const LEVEL = [
   {
     title: 'any',
@@ -99,5 +97,5 @@ const COMPANY_LOCATION: TCompanyLocation[] = [
   }
 ];
 
-export {AppRoute, GENRE, LEVEL, AuthorizationStatus, getAuthorizationStatus, SPETERBURG, COMPANY_LOCATION, USER_AUTH_DATA, APIRoute};
+export {AppRoute, GENRE, LEVEL, AuthorizationStatus, SPETERBURG, COMPANY_LOCATION, USER_AUTH_DATA, APIRoute};
 
