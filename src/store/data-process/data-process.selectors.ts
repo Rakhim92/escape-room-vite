@@ -7,9 +7,6 @@ export const getQuests = (state: RootState): TQuest[] =>
 export const getIsDataLoading = (state: RootState): boolean =>
   state.DATA.isDataLoading;
 
-// export const getCurrentOffer = (state: RootState): TOffer | TOfferExtended | null =>
-//   state.DATA.currentOffer;
-
 export const getMyQuests = (state: RootState): TMyBooking[] =>
   state.DATA.myQuests as TMyBooking[];
 

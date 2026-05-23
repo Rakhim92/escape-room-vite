@@ -4,7 +4,7 @@ import { AuthorizationStatus } from '../../const';
 export const getAuthorizationStatus = (state: RootState): AuthorizationStatus =>
   state.USER.authorizationStatus;
 
-export const getAuthInfo = (state: RootState): string | null =>
+export const getUserEmail = (state: RootState): string | null =>
   state.USER.authInfo;
 
 // Полезный селектор-хелпер для быстрой проверки прав доступа

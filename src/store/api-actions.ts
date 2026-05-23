@@ -65,6 +65,8 @@ export const logoutAction = createAsyncThunk<void, undefined, {
     localStorage.removeItem(USER_AUTH_DATA);
     dispatch(saveAuthInfo(null));
     dispatch(requireAuthorization(AuthorizationStatus.NoAuth));
+    // Добавляем автоматический переход на главную после выхода
+    dispatch(redirectToRoute(AppRoute.Root));
   },
 );
 

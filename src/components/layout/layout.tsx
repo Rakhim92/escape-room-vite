@@ -1,7 +1,7 @@
 import {Link, NavLink, Outlet} from 'react-router-dom';
 import {AppRoute, AuthorizationStatus} from '../../const';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getAuthorizationStatus } from '../../store/user-process/user-process.selectors';
+import { getAuthorizationStatus} from '../../store/user-process/user-process.selectors';
 import { logoutAction } from '../../store/api-actions'; // Импортируем созданный ранее экшен логаута
 import { MouseEvent } from 'react';
 
