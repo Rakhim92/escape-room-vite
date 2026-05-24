@@ -2,6 +2,7 @@ import axios, {AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosEr
 import {StatusCodes} from 'http-status-codes';
 import {getToken} from './token';
 import {toast} from 'react-toastify';
+import { APIRoute } from '../const';
 
 type DetailMessageType = {
   type: string;
@@ -20,7 +21,6 @@ const BACKEND_URL = 'https://grading.design.htmlacademy.pro/v1/escape-room/';
 const REQUEST_TIMEOUT = 5000;
 
 export const createAPI = (): AxiosInstance => {
-  // Конфигурация пакета Axios для отправки сетевых запросов
   const api = axios.create({
     baseURL: BACKEND_URL,
     timeout: REQUEST_TIMEOUT,
@@ -42,10 +42,21 @@ export const createAPI = (): AxiosInstance => {
     (response) => response,
     (error: AxiosError<DetailMessageType>) => {
       if (error.response && shouldDisplayError(error.response)) {
-        const detailMessage = (error.response.data);
+        // ИГНОРИРУЕМ ошибку 401 при автоматической проверке токена (/login по методу GET)
+        const isCheckAuthRequest =
+          error.response.status === StatusCodes.UNAUTHORIZED &&
+          error.config?.url === APIRoute.Login &&
+          error.config?.method === 'get';
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        toast.warn(detailMessage.message);
+        if (!isCheckAuthRequest) {
+          const detailMessage = error.response.data;
+          toast.error(detailMessage.message || 'Произошла ошибка выполнения запроса');
+        }
+      }
+
+      // Ловим ошибки, если сервер полностью «лежит» (нет error.response)
+      if (!error.response) {
+        toast.error('Проблемы с интернет-соединением или сервер недоступен');
       }
 
       throw error;

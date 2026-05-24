@@ -4,6 +4,8 @@ import 'leaflet/dist/leaflet.css';
 import useMap from './use-map';
 import { TBookingLocation, TCompanyLocation } from '../../types';
 import { SPETERBURG } from '../../const';
+import pinDefault from '/img/svg/pin-default.svg';
+import pinActive from '/img/svg/pin-active.svg';
 
 export type MapProps = {
   bookingLocations: TBookingLocation[] | TCompanyLocation[];
@@ -12,13 +14,13 @@ export type MapProps = {
 };
 
 const defaultCustomIcon = new Icon({
-  iconUrl: './img/svg/pin-default.svg',
+  iconUrl: pinDefault,
   iconSize: [27, 39],
   iconAnchor: [13.5, 39]
 });
 
 const currentCustomIcon = new Icon({
-  iconUrl: './img/svg/pin-active.svg',
+  iconUrl: pinActive,
   iconSize: [27, 39],
   iconAnchor: [13.5, 39]
 });
