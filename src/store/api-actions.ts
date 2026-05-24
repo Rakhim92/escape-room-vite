@@ -40,10 +40,10 @@ export const postBookingAction = createAsyncThunk<
   }
 >(
   'data/postBooking',
-  async ({ questId, bookingData }, { dispatch, extra: api }) => {
+  async ({ questId, bookingData }, { extra: api }) => {
     // Отправляем POST-запрос на эндпоинт вида: /quests/:id/booking
     await api.post(`${APIRoute.Quests}/${questId}/booking`, bookingData);
-    dispatch(redirectToRoute(AppRoute.MyQuests));
+    // dispatch(redirectToRoute(AppRoute.MyQuests));
   },
 );
 

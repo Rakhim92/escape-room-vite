@@ -1,5 +1,5 @@
 import { FormEvent, ReactElement, useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 // import { TBookingLocation, TExtendedQuest } from '../../types';
 import Map from '../../components/map/map';
 import NotFoundPage from '../not-found-page/not-found-page';
@@ -9,6 +9,7 @@ import { fetchBookingLocationsAction, postBookingAction } from '../../store/api-
 import { clearBookingLocations } from '../../store/data-process/data-process';
 import LoadingScreen from '../../components/loading-screen/loading-screen';
 import { toast } from 'react-toastify';
+import { AppRoute } from '../../const';
 
 // type TBookingPageProps = {
 //   extendedQuests: TExtendedQuest[];
@@ -16,8 +17,11 @@ import { toast } from 'react-toastify';
 // };
 
 const BookingPage = (): ReactElement => {
+  // Локальное состояние для отслеживания отправки формы на сервер
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const {id} = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   // Получаем данные из глобального хранилища
   const quests = useAppSelector(getQuests);
@@ -54,6 +58,10 @@ const BookingPage = (): ReactElement => {
 
   // Сбрасываем выбранное время при переключении адреса
   const handleLocationChange = (locationId: string) => {
+    // Запрещаем менять локацию во время отправки формы
+    if (isSubmitting) {
+      return;
+    }
     setActiveLocationId(locationId);
     setSelectedSlot('');
   };
@@ -89,6 +97,8 @@ const BookingPage = (): ReactElement => {
         return;
       }
 
+      setIsSubmitting(true);
+
       dispatch(postBookingAction({
         questId: selectedQuest.id,
         bookingData: {
@@ -100,7 +110,17 @@ const BookingPage = (): ReactElement => {
           peopleCount: peopleCount,
           placeId: activeLocationId,
         }
-      }));
+      }))
+        .unwrap() // Позволяет поймать ошибку Thunk, если запрос упадет
+        .then(() => {
+          // Срабатывает ТОЛЬКО при успешном ответе сервера (status 201/200)
+          toast.success('Квест успешно забронирован!');
+          navigate(AppRoute.MyQuests); // Гарантированный редирект силами React Router
+        })
+        .catch(() => {
+          // Если сервер вернул ошибку, разблокируем форму для исправления данных
+          setIsSubmitting(false);
+        });
     }
   };
 
@@ -132,7 +152,6 @@ const BookingPage = (): ReactElement => {
                 onLocationChange={handleLocationChange}
               />
             </div>
-            {/* Отображаем динамический адрес выбранного филиала */}
             <p className="booking-map__address">Вы&nbsp;выбрали: {activeLocation.location.address}</p>
           </div>
         </div>
@@ -146,34 +165,44 @@ const BookingPage = (): ReactElement => {
             <fieldset className="booking-form__date-section">
               <legend className="booking-form__date-title">Сегодня</legend>
               <div className="booking-form__date-inner-wrapper">
-                {activeLocation.slots.today.map((slot) => (
-                  <label className="custom-radio booking-form__date" key={`today-${slot.time}`}>
-                    <input
-                      type="radio"
-                      name="date"
-                      value={`today-${slot.time}`}
-                      disabled={!slot.isAvailable}
-                    />
-                    <span className="custom-radio__label">{slot.time}</span>
-                  </label>
-                ))}
+                {activeLocation.slots.today.map((slot) => {
+                  const slotValue = `today-${slot.time}`;
+                  return (
+                    <label className="custom-radio booking-form__date" key={`today-${slot.time}`}>
+                      <input
+                        type="radio"
+                        name="date"
+                        value={slotValue}
+                        checked={selectedSlot === slotValue}
+                        disabled={!slot.isAvailable}
+                        onChange={(e) => setSelectedSlot(e.target.value)}
+                      />
+                      <span className="custom-radio__label">{slot.time}</span>
+                    </label>
+                  );
+                })}
               </div>
             </fieldset>
             {/* Рендеринг слотов НА ЗАВТРА */}
             <fieldset className="booking-form__date-section">
               <legend className="booking-form__date-title">Завтра</legend>
               <div className="booking-form__date-inner-wrapper">
-                {activeLocation.slots.tomorrow.map((slot) => (
-                  <label className="custom-radio booking-form__date" key={`tomorrow-${slot.time}`}>
-                    <input
-                      type="radio"
-                      name="date"
-                      value={`tomorrow-${slot.time}`}
-                      disabled={!slot.isAvailable}
-                    />
-                    <span className="custom-radio__label">{slot.time}</span>
-                  </label>
-                ))}
+                {activeLocation.slots.tomorrow.map((slot) => {
+                  const slotValue = `tomorrow-${slot.time}`;
+                  return (
+                    <label className="custom-radio booking-form__date" key={slotValue}>
+                      <input
+                        type="radio"
+                        name="date"
+                        value={slotValue}
+                        checked={selectedSlot === slotValue}
+                        disabled={!slot.isAvailable}
+                        onChange={(e) => setSelectedSlot(e.target.value)}
+                      />
+                      <span className="custom-radio__label">{slot.time}</span>
+                    </label>
+                  );
+                })}
               </div>
             </fieldset>
           </fieldset>
@@ -187,7 +216,7 @@ const BookingPage = (): ReactElement => {
                 id="name"
                 name="name"
                 placeholder="Имя"
-                pattern="[А-Яа-яЁёA-Za-z'- ]{1,}"
+                pattern="[А-Яа-яЁёA-Za-z'-\- ]{1,}"
                 ref={nameRef}
                 required
               />
@@ -220,7 +249,6 @@ const BookingPage = (): ReactElement => {
                 type="checkbox"
                 id="children"
                 name="children"
-                defaultChecked
                 ref={childrenRef}
               />
               <span className="custom-checkbox__icon">
