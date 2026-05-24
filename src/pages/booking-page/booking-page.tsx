@@ -8,6 +8,7 @@ import { getBookingLocations, getIsDataLoading, getQuests } from '../../store/da
 import { fetchBookingLocationsAction, postBookingAction } from '../../store/api-actions';
 import { clearBookingLocations } from '../../store/data-process/data-process';
 import LoadingScreen from '../../components/loading-screen/loading-screen';
+import { toast } from 'react-toastify';
 
 // type TBookingPageProps = {
 //   extendedQuests: TExtendedQuest[];
@@ -74,7 +75,7 @@ const BookingPage = (): ReactElement => {
     evt.preventDefault();
 
     if (!selectedSlot) {
-      alert('Пожалуйста, выберите дату и время квеста');
+      toast.error('Пожалуйста, выберите дату и время квеста');
       return;
     }
 
@@ -84,7 +85,7 @@ const BookingPage = (): ReactElement => {
       const peopleCount = Number(peopleCountRef.current.value);
 
       if (peopleCount < minPeople || peopleCount > maxPeople) {
-        alert(`Количество участников должно быть от ${minPeople} до ${maxPeople} чел.`);
+        toast.error(`Количество участников должно быть от ${minPeople} до ${maxPeople} чел.`);
         return;
       }
 
