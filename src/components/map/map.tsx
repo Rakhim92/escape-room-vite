@@ -8,22 +8,23 @@ import { SPETERBURG } from '../../const';
 export type MapProps = {
   bookingLocations: TBookingLocation[] | TCompanyLocation[];
   activeLocation: TBookingLocation | TCompanyLocation;
+  onLocationChange?: (id: string) => void;
 };
 
 const defaultCustomIcon = new Icon({
-  iconUrl: '/img/svg/pin-default.svg',
+  iconUrl: './img/svg/pin-default.svg',
   iconSize: [27, 39],
   iconAnchor: [13.5, 39]
 });
 
 const currentCustomIcon = new Icon({
-  iconUrl: '/img/svg/pin-active.svg',
+  iconUrl: './img/svg/pin-active.svg',
   iconSize: [27, 39],
   iconAnchor: [13.5, 39]
 });
 
 function Map(props: MapProps): JSX.Element {
-  const {bookingLocations, activeLocation} = props;
+  const {bookingLocations, activeLocation, onLocationChange} = props;
 
   const mapRef = useRef(null);
   const map = useMap(mapRef, SPETERBURG);
@@ -49,13 +50,19 @@ function Map(props: MapProps): JSX.Element {
         marker
           .setIcon(isCurrent ? currentCustomIcon : defaultCustomIcon)
           .addTo(markerLayer);
+        // Исправлено: навешиваем обработчик клика на маркер
+        if (onLocationChange) {
+          marker.on('click', () => {
+            onLocationChange(location.id);
+          });
+        }
       });
 
       return () => {
         map.removeLayer(markerLayer);
       };
     }
-  }, [map, bookingLocations, activeLocation]);
+  }, [map, bookingLocations, activeLocation, onLocationChange]);
 
   return <div className='map__container' ref={mapRef}/>;
 }

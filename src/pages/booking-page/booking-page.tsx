@@ -1,6 +1,6 @@
-import { ReactElement, useEffect, useRef, useState } from 'react';
+import { FormEvent, ReactElement, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { TBookingLocation, TExtendedQuest } from '../../types';
+// import { TBookingLocation, TExtendedQuest } from '../../types';
 import Map from '../../components/map/map';
 import NotFoundPage from '../not-found-page/not-found-page';
 import { useAppDispatch, useAppSelector } from '../../hooks';
@@ -73,20 +73,20 @@ const BookingPage = (): ReactElement => {
   const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
 
-    // if (!selectedSlot) {
-    //   alert('Пожалуйста, выберите дату и время квеста');
-    //   return;
-    // }
+    if (!selectedSlot) {
+      alert('Пожалуйста, выберите дату и время квеста');
+      return;
+    }
 
     const [bookingDate, bookingTime] = selectedSlot.split('-');
 
     if (nameRef.current && phoneRef.current && peopleCountRef.current) {
       const peopleCount = Number(peopleCountRef.current.value);
 
-      // if (peopleCount < minPeople || peopleCount > maxPeople) {
-      //   alert(`Количество участников должно быть от ${minPeople} до ${maxPeople} чел.`);
-      //   return;
-      // }
+      if (peopleCount < minPeople || peopleCount > maxPeople) {
+        alert(`Количество участников должно быть от ${minPeople} до ${maxPeople} чел.`);
+        return;
+      }
 
       dispatch(postBookingAction({
         questId: selectedQuest.id,
@@ -102,7 +102,6 @@ const BookingPage = (): ReactElement => {
       }));
     }
   };
-
 
   return (
     <main className="page-content decorated-page">
@@ -129,6 +128,7 @@ const BookingPage = (): ReactElement => {
               <Map
                 bookingLocations={bookingLocations}
                 activeLocation={activeLocation}
+                onLocationChange={handleLocationChange}
               />
             </div>
             {/* Отображаем динамический адрес выбранного филиала */}

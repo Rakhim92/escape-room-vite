@@ -43,7 +43,6 @@ export const postBookingAction = createAsyncThunk<
   async ({ questId, bookingData }, { dispatch, extra: api }) => {
     // Отправляем POST-запрос на эндпоинт вида: /quests/:id/booking
     await api.post(`${APIRoute.Quests}/${questId}/booking`, bookingData);
-
     dispatch(redirectToRoute(AppRoute.MyQuests));
   },
 );
@@ -103,7 +102,6 @@ export const loginAction = createAsyncThunk<void, AuthData, {
     dispatch(requireAuthorization(AuthorizationStatus.Auth));
     localStorage.setItem(USER_AUTH_DATA, JSON.stringify(email));
     dispatch(saveAuthInfo(email));
-    dispatch(redirectToRoute(AppRoute.Root));
   },
 );
 

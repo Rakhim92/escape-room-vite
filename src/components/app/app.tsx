@@ -6,7 +6,7 @@ import MainPage from '../../pages/main-page/main-page';
 import QuestPage from '../../pages/quest-page/quest-page';
 import ContactsPage from '../../pages/contacts-page/contacts-page';
 import LoginPage from '../../pages/login-page/login-page';
-// import BookingPage from '../../pages/booking-page/booking-page';
+import BookingPage from '../../pages/booking-page/booking-page';
 import MyQuests from '../../pages/my-quests/my-quests';
 import PrivateRoute from '../private-route/private-route';
 import PublicRoute from '../public-route/public-route';
@@ -56,17 +56,14 @@ const App = () => {
             >
             </Route>
           </Route>
-          {/* <Route
+          <Route
             path={AppRoute.Booking}
             element={
               <PrivateRoute authorizationStatus={authorizationStatus}>
-                <BookingPage
-                  extendedQuests={extendedQuests}
-                  bookingLocations={bookingLocations}
-                />
+                <BookingPage/>
               </PrivateRoute>
             }
-          /> */}
+          />
           <Route
             path={AppRoute.Contacts}
             element={<ContactsPage/>}
