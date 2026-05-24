@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TBookingLocation, TExtendedQuest, TMyBooking, TQuest } from '../../types';
 import { AuthorizationStatus } from '../../const';
 import { requireAuthorization } from '../user-process/user-process';
-import { fetchBookingLocationsAction, fetchExtendedQuestAction } from '../api-actions';
+import { deleteBookingAction, fetchBookingLocationsAction, fetchExtendedQuestAction } from '../api-actions';
 
 // Создаем чистый мутабельный тип специально для Redux State
 type TMutableBooking = Omit<TMyBooking, 'location'> & {
@@ -71,6 +71,13 @@ export const dataProcess = createSlice({
         if (action.payload === AuthorizationStatus.NoAuth) {
           state.myQuests = [];
         }
+      })
+      .addCase(deleteBookingAction.fulfilled, (state, action) => {
+      // action.payload содержит строку id удаленного бронирования
+      // Создаем новую ссылку на массив, чтобы триггернуть перерисовку в React
+        state.myQuests = state.myQuests.filter(
+          (booking) => booking.id !== action.payload
+        );
       })
       .addCase(fetchBookingLocationsAction.pending, (state) => {
         state.isDataLoading = true;
