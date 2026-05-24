@@ -1,28 +1,42 @@
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 // import browserHistory from '../../browser-history';
-import {AppRoute} from '../../const';
+import {AppRoute, AuthorizationStatus} from '../../const';
 import Layout from '../layout/layout';
 import MainPage from '../../pages/main-page/main-page';
 import QuestPage from '../../pages/quest-page/quest-page';
 import ContactsPage from '../../pages/contacts-page/contacts-page';
 import LoginPage from '../../pages/login-page/login-page';
-import BookingPage from '../../pages/booking-page/booking-page';
+// import BookingPage from '../../pages/booking-page/booking-page';
 import MyQuests from '../../pages/my-quests/my-quests';
 import PrivateRoute from '../private-route/private-route';
 import PublicRoute from '../public-route/public-route';
 import NotFoundPage from '../../pages/not-found-page/not-found-page';
-import { TBookingLocation, TExtendedQuest, TQuest} from '../../types';
-import { useAppSelector } from '../../hooks';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getAuthorizationStatus } from '../../store/user-process/user-process.selectors';
+import { fetchMyQuestsAction, fetchQuestsAction } from '../../store/api-actions';
+import { useEffect } from 'react';
+import { getIsDataLoading, getQuests } from '../../store/data-process/data-process.selectors';
+import LoadingScreen from '../loading-screen/loading-screen';
 
-type TAppProps = {
-  quests: TQuest[];
-  extendedQuests: TExtendedQuest[];
-  bookingLocations: TBookingLocation[];
-}
-
-const App = ({quests, extendedQuests, bookingLocations}: TAppProps) => {
+const App = () => {
+  const quests = useAppSelector(getQuests);
   const authorizationStatus = useAppSelector(getAuthorizationStatus);
+  const isOffersDataLoading = useAppSelector(getIsDataLoading);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchQuestsAction());
+    if (authorizationStatus === AuthorizationStatus.Auth) {
+      dispatch(fetchMyQuestsAction());
+    }
+  }, [dispatch, authorizationStatus]);
+
+  if (isOffersDataLoading && quests.length === 0) {
+    return (
+      <LoadingScreen />
+    );
+  }
+
   return (
     <BrowserRouter>
       <Routes>
@@ -32,25 +46,17 @@ const App = ({quests, extendedQuests, bookingLocations}: TAppProps) => {
         >
           <Route
             index
-            element={
-              <MainPage
-                quests = {quests}
-              />
-            }
+            element={<MainPage/>}
           />
           <Route
             path={AppRoute.Quest}
           >
             <Route path=":id"
-              element={
-                <QuestPage
-                  extendedQuests = {extendedQuests}
-                />
-              }
+              element={<QuestPage/>}
             >
             </Route>
           </Route>
-          <Route
+          {/* <Route
             path={AppRoute.Booking}
             element={
               <PrivateRoute authorizationStatus={authorizationStatus}>
@@ -60,7 +66,7 @@ const App = ({quests, extendedQuests, bookingLocations}: TAppProps) => {
                 />
               </PrivateRoute>
             }
-          />
+          /> */}
           <Route
             path={AppRoute.Contacts}
             element={<ContactsPage/>}

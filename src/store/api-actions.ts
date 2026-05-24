@@ -1,11 +1,65 @@
 import {AxiosInstance} from 'axios';
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {TQuest, UserData, AuthData, AppDispatch, State, TMyBooking} from '../types.ts';
+import {TQuest, UserData, AuthData, AppDispatch, State, TMyBooking, TBookingLocation, TExtendedQuest} from '../types.ts';
 import { redirectToRoute} from './action';
 import {requireAuthorization, saveAuthInfo} from './user-process/user-process.ts';
 import {loadMyQuests, loadQuests, setLoadingStatus } from './data-process/data-process.ts';
 import {saveToken, dropToken} from '../services/token';
 import {APIRoute, AuthorizationStatus, AppRoute, USER_AUTH_DATA} from '../const';
+
+export const fetchExtendedQuestAction = createAsyncThunk<TExtendedQuest, string, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'data/fetchExtendedQuest',
+  async (questId, { extra: api }) => {
+    const { data } = await api.get<TExtendedQuest>(`${APIRoute.Quests}/${questId}`);
+    return data;
+  },
+);
+
+export type TBookingPostData = {
+  date: 'today' | 'tomorrow';
+  time: string;
+  contactPerson: string;
+  phone: string;
+  withChildren: boolean;
+  peopleCount: number;
+  placeId: string;
+};
+
+// 2. Создаем асинхронный экшен
+export const postBookingAction = createAsyncThunk<
+  void, // Экшен ничего не возвращает в редьюсер, так как мы сразу уходим на другую страницу
+  { questId: string; bookingData: TBookingPostData }, // Принимает объект с ID квеста и данными формы
+  {
+    dispatch: AppDispatch;
+    state: State;
+    extra: AxiosInstance;
+  }
+>(
+  'data/postBooking',
+  async ({ questId, bookingData }, { dispatch, extra: api }) => {
+    // Отправляем POST-запрос на эндпоинт вида: /quests/:id/booking
+    await api.post(`${APIRoute.Quests}/${questId}/booking`, bookingData);
+
+    dispatch(redirectToRoute(AppRoute.MyQuests));
+  },
+);
+
+export const fetchBookingLocationsAction = createAsyncThunk<TBookingLocation[], string, {
+  dispatch: AppDispatch;
+  state: State;
+  extra: AxiosInstance;
+}>(
+  'data/fetchBookingLocations',
+  async (questId, { extra: api }) => {
+    // Пример эндпоинта: /quests/:id/booking
+    const { data } = await api.get<TBookingLocation[]>(`${APIRoute.Quests}/${questId}/booking`);
+    return data;
+  },
+);
 
 export const fetchQuestsAction = createAsyncThunk<void, undefined, {
   dispatch: AppDispatch;

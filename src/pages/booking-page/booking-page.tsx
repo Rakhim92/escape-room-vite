@@ -1,32 +1,108 @@
-import { ReactElement, useState } from 'react';
+import { ReactElement, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { TBookingLocation, TExtendedQuest } from '../../types';
 import Map from '../../components/map/map';
 import NotFoundPage from '../not-found-page/not-found-page';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { getBookingLocations, getIsDataLoading, getQuests } from '../../store/data-process/data-process.selectors';
+import { fetchBookingLocationsAction, postBookingAction } from '../../store/api-actions';
+import { clearBookingLocations } from '../../store/data-process/data-process';
+import LoadingScreen from '../../components/loading-screen/loading-screen';
 
-type TBookingPageProps = {
-  extendedQuests: TExtendedQuest[];
-  bookingLocations: TBookingLocation[];
-};
+// type TBookingPageProps = {
+//   extendedQuests: TExtendedQuest[];
+//   bookingLocations: TBookingLocation[];
+// };
 
-const BookingPage = ({ extendedQuests, bookingLocations }: TBookingPageProps): ReactElement => {
-  const params = useParams<{ id: string }>();
-  // Ищем выбранный квест в расширенном массиве данных
-  const selectedQuest = extendedQuests.find((item) => item.id === params.id);
+const BookingPage = (): ReactElement => {
+  const {id} = useParams<{ id: string }>();
+  const dispatch = useAppDispatch();
 
-  // Храним ID выбранного филиала (по умолчанию — первый из списка)
-  const [activeLocationId, ] = useState<string>(
-    bookingLocations[0]?.id || ''
-  );
+  // Получаем данные из глобального хранилища
+  const quests = useAppSelector(getQuests);
+  const bookingLocations = useAppSelector(getBookingLocations);
+  const isDataLoading = useAppSelector(getIsDataLoading);
 
-  // Находим объект активной локации по её ID
+  const selectedQuest = quests.find((item) => item.id === id);
+
+  // Стейт для активного филиала квеста
+  const [activeLocationId, setActiveLocationId] = useState<string>('');
+  const [selectedSlot, setSelectedSlot] = useState<string>('');
+
+  const nameRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const peopleCountRef = useRef<HTMLInputElement>(null);
+  const childrenRef = useRef<HTMLInputElement>(null);
+
+  // Загружаем локации при открытии страницы и очищаем при закрытии
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchBookingLocationsAction(id));
+    }
+    return () => {
+      dispatch(clearBookingLocations());
+    };
+  }, [id, dispatch]);
+
+  // Как только локации загрузились, устанавливаем первую активной по умолчанию
+  useEffect(() => {
+    if (bookingLocations.length > 0 && !activeLocationId) {
+      setActiveLocationId(bookingLocations[0].id);
+    }
+  }, [bookingLocations, activeLocationId]);
+
+  // Сбрасываем выбранное время при переключении адреса
+  const handleLocationChange = (locationId: string) => {
+    setActiveLocationId(locationId);
+    setSelectedSlot('');
+  };
+
+  if (isDataLoading || (bookingLocations.length > 0 && !activeLocationId)) {
+    return <LoadingScreen />;
+  }
+
   const activeLocation = bookingLocations.find((loc) => loc.id === activeLocationId);
 
   if (!selectedQuest || !activeLocation) {
     return <NotFoundPage />;
   }
 
-  const { title, coverImg, coverImgWebp } = selectedQuest;
+  const { title, previewImg: coverImg, previewImgWebp: coverImgWebp, peopleMinMax } = selectedQuest;
+  const [minPeople, maxPeople] = peopleMinMax;
+
+  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+
+    // if (!selectedSlot) {
+    //   alert('Пожалуйста, выберите дату и время квеста');
+    //   return;
+    // }
+
+    const [bookingDate, bookingTime] = selectedSlot.split('-');
+
+    if (nameRef.current && phoneRef.current && peopleCountRef.current) {
+      const peopleCount = Number(peopleCountRef.current.value);
+
+      // if (peopleCount < minPeople || peopleCount > maxPeople) {
+      //   alert(`Количество участников должно быть от ${minPeople} до ${maxPeople} чел.`);
+      //   return;
+      // }
+
+      dispatch(postBookingAction({
+        questId: selectedQuest.id,
+        bookingData: {
+          date: bookingDate as 'today' | 'tomorrow',
+          time: bookingTime,
+          contactPerson: nameRef.current.value.trim(),
+          phone: phoneRef.current.value.trim(),
+          withChildren: childrenRef.current?.checked || false,
+          peopleCount: peopleCount,
+          placeId: activeLocationId,
+        }
+      }));
+    }
+  };
+
 
   return (
     <main className="page-content decorated-page">
@@ -59,7 +135,10 @@ const BookingPage = ({ extendedQuests, bookingLocations }: TBookingPageProps): R
             <p className="booking-map__address">Вы&nbsp;выбрали: {activeLocation.location.address}</p>
           </div>
         </div>
-        <form className="booking-form" action="https://echo.htmlacademy.ru/" method="post">
+        <form
+          className="booking-form"
+          onSubmit={handleSubmit}
+        >
           <fieldset className="booking-form__section">
             <legend className="visually-hidden">Выбор даты и времени</legend>
             {/* Рендеринг слотов НА СЕГОДНЯ */}
@@ -102,21 +181,50 @@ const BookingPage = ({ extendedQuests, bookingLocations }: TBookingPageProps): R
             <legend className="visually-hidden">Контактная информация</legend>
             <div className="custom-input booking-form__input">
               <label className="custom-input__label" htmlFor="name">Ваше имя</label>
-              <input type="text" id="name" name="name" placeholder="Имя" pattern="[А-Яа-яЁёA-Za-z'- ]{1,}" />
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Имя"
+                pattern="[А-Яа-яЁёA-Za-z'- ]{1,}"
+                ref={nameRef}
+                required
+              />
             </div>
             <div className="custom-input booking-form__input">
               <label className="custom-input__label" htmlFor="tel">Контактный телефон</label>
-              <input type="tel" id="tel" name="tel" placeholder="Телефон" pattern="[0-9]{10,}" />
+              <input
+                type="tel"
+                id="tel"
+                name="tel"
+                placeholder="Телефон"
+                pattern="[0-9]{10,}"
+                ref={phoneRef}
+                required
+              />
             </div>
             <div className="custom-input booking-form__input">
               <label className="custom-input__label" htmlFor="person">Количество участников</label>
-              <input type="number" id="person" name="person" placeholder="Количество участников" />
+              <input
+                type="number"
+                id="person"
+                name="person"
+                placeholder="Количество участников"
+                ref={peopleCountRef}
+                required
+              />
             </div>
             <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--children">
-              <input type="checkbox" id="children" name="children" defaultChecked />
+              <input
+                type="checkbox"
+                id="children"
+                name="children"
+                defaultChecked
+                ref={childrenRef}
+              />
               <span className="custom-checkbox__icon">
                 <svg width="20" height="17" aria-hidden="true">
-                  <use href="#icon-tick" /> {/* Исправлено: href вместо xlinkHref */}
+                  <use href="#icon-tick" />
                 </svg>
               </span>
               <span className="custom-checkbox__label">Со&nbsp;мной будут дети</span>
@@ -124,7 +232,12 @@ const BookingPage = ({ extendedQuests, bookingLocations }: TBookingPageProps): R
           </fieldset>
           <button className="btn btn--accent btn--cta booking-form__submit" type="submit">Забронировать</button>
           <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--agreement">
-            <input type="checkbox" id="id-order-agreement" name="user-agreement" required />
+            <input
+              type="checkbox"
+              id="id-order-agreement"
+              name="user-agreement"
+              required
+            />
             <span className="custom-checkbox__icon">
               <svg width="20" height="17" aria-hidden="true">
                 <use href="#icon-tick" />

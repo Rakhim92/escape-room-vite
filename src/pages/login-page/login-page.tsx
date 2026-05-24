@@ -67,6 +67,8 @@ const LoginPage = ():JSX.Element => {
                     id="password"
                     name="password"
                     placeholder="Пароль"
+                    pattern="^(?=.*[A-Za-zА-Яа-я])(?=.*\d)\S+$"
+                    title="Пароль должен содержать минимум одну букву и одну цифры без пробелов"
                     required
                   />
                 </div>

@@ -1,11 +1,11 @@
 import { TMyBooking, TQuest } from '../../types';
 import QuestCard from './quest-card';
 
-type TQuestsCardList = {
+type TQuestsList = {
   quests: TQuest[] | TMyBooking[];
 }
 
-const QuestsCardList = ({quests}: TQuestsCardList):JSX.Element => (
+const QuestsCardList = ({quests}: TQuestsList):JSX.Element => (
   <div className="cards-grid">
     {quests.map((quest) => (
       <QuestCard
@@ -15,5 +15,6 @@ const QuestsCardList = ({quests}: TQuestsCardList):JSX.Element => (
     ))}
   </div>
 );
+
 
 export default QuestsCardList;

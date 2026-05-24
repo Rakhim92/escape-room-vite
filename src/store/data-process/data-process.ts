@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { TMyBooking, TQuest } from '../../types';
+import { TBookingLocation, TExtendedQuest, TMyBooking, TQuest } from '../../types';
 import { AuthorizationStatus } from '../../const';
 import { requireAuthorization } from '../user-process/user-process';
+import { fetchBookingLocationsAction, fetchExtendedQuestAction } from '../api-actions';
 
 // Создаем чистый мутабельный тип специально для Redux State
 type TMutableBooking = Omit<TMyBooking, 'location'> & {
@@ -15,18 +16,29 @@ type TDataProcess = {
   quests: TQuest[];
   isDataLoading: boolean;
   myQuests: TMutableBooking[];
+  bookingLocations: TBookingLocation[];
+  currentQuest: TExtendedQuest | null;
 };
 
 const initialState: TDataProcess = {
   quests: [],
   isDataLoading: false,
   myQuests: [],
+  bookingLocations: [],
+  currentQuest: null,
 };
 
 export const dataProcess = createSlice({
   name: 'DATA',
   initialState,
   reducers: {
+    // Редюсер для очистки локаций при уходе со страницы
+    clearBookingLocations: (state) => {
+      state.bookingLocations = [];
+    },
+    clearCurrentQuest: (state) => {
+      state.currentQuest = null;
+    },
     setLoadingStatus: (state, action: PayloadAction<boolean>) => {
       state.isDataLoading = action.payload;
     },
@@ -51,6 +63,26 @@ export const dataProcess = createSlice({
         if (action.payload === AuthorizationStatus.NoAuth) {
           state.myQuests = [];
         }
+      })
+      .addCase(fetchBookingLocationsAction.pending, (state) => {
+        state.isDataLoading = true;
+      })
+      .addCase(fetchBookingLocationsAction.fulfilled, (state, action) => {
+        state.bookingLocations = action.payload;
+        state.isDataLoading = false;
+      })
+      .addCase(fetchBookingLocationsAction.rejected, (state) => {
+        state.isDataLoading = false;
+      })
+      .addCase(fetchExtendedQuestAction.pending, (state) => {
+        state.isDataLoading = true;
+      })
+      .addCase(fetchExtendedQuestAction.fulfilled, (state, action) => {
+        state.currentQuest = action.payload;
+        state.isDataLoading = false;
+      })
+      .addCase(fetchExtendedQuestAction.rejected, (state) => {
+        state.isDataLoading = false;
       });
   }
 });
@@ -60,6 +92,8 @@ export const {
   changeQuests,
   loadQuests,
   setLoadingStatus,
+  clearBookingLocations,
   // changeCurrentOffer,
   loadMyQuests,
+  clearCurrentQuest
 } = dataProcess.actions;

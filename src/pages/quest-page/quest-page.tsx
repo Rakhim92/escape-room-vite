@@ -1,11 +1,17 @@
 import { Link, useParams } from 'react-router-dom';
-import { TExtendedQuest } from '../../types';
+// import { TExtendedQuest } from '../../types';
 import NotFoundPage from '../not-found-page/not-found-page';
 import { AppRoute } from '../../const';
+import { useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { getCurrentQuest, getIsDataLoading } from '../../store/data-process/data-process.selectors';
+import { fetchExtendedQuestAction } from '../../store/api-actions';
+import { clearCurrentQuest } from '../../store/data-process/data-process';
+import LoadingScreen from '../../components/loading-screen/loading-screen';
 
-type TQuestsPage = {
-  extendedQuests: readonly TExtendedQuest[];
-}
+// type TQuestsPage = {
+//   extendedQuests: readonly TExtendedQuest[];
+// }
 
 const LevelLabel = {
   easy: 'Лёгкий',
@@ -21,9 +27,29 @@ const GenreLabel: Record<string, string> = {
   sciFi: 'Sci-fi',
 };
 
-const QuestPage = ({extendedQuests}: TQuestsPage):JSX.Element => {
-  const params = useParams<{ id: string }>();
-  const selectedQuest = extendedQuests.find((item) => item.id === params.id) as TExtendedQuest;
+const QuestPage = ():JSX.Element => {
+  const { id: urlId } = useParams<{ id: string }>();
+  const dispatch = useAppDispatch();
+
+  const selectedQuest = useAppSelector(getCurrentQuest);
+  const isDataLoading = useAppSelector(getIsDataLoading);
+
+  // 1. Хук только для загрузки данных (без возврата cleanup-функции!)
+  useEffect(() => {
+    if (urlId && (!selectedQuest || selectedQuest.id !== urlId)) {
+      dispatch(fetchExtendedQuestAction(urlId));
+    }
+  }, [urlId, dispatch, selectedQuest]);
+
+  // 2. Хук только для очистки данных при полном размонтировании (уходе со страницы)
+  useEffect(() => {
+    dispatch(clearCurrentQuest());
+  }, [dispatch]);
+
+  if (isDataLoading) {
+    return <LoadingScreen />;
+  }
+
   if (!selectedQuest) {
     return <NotFoundPage />;
   }
@@ -67,7 +93,7 @@ const QuestPage = ({extendedQuests}: TQuestsPage):JSX.Element => {
           <p className="quest-page__description">{description}</p>
           <Link
             className="btn btn--accent btn--cta quest-page__btn"
-            to={AppRoute.Booking.replace(':id', id)}
+            to={AppRoute.Booking.replace(':id', id || '')}
           >
             Забронировать
           </Link>
