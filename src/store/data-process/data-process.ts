@@ -18,6 +18,8 @@ type TDataProcess = {
   myQuests: TMutableBooking[];
   bookingLocations: TBookingLocation[];
   currentQuest: TExtendedQuest | null;
+  currentType: string; // по умолчанию 'all'
+  currentLevel: string; // по умолчанию 'any'
 };
 
 const initialState: TDataProcess = {
@@ -26,6 +28,8 @@ const initialState: TDataProcess = {
   myQuests: [],
   bookingLocations: [],
   currentQuest: null,
+  currentType: 'all', // 'all' означает, что фильтр не выбран
+  currentLevel: 'any',
 };
 
 export const dataProcess = createSlice({
@@ -48,11 +52,15 @@ export const dataProcess = createSlice({
     changeQuests: (state, action: PayloadAction<TQuest[]>) => {
       state.quests = action.payload;
     },
-    // changeCurrentOffer: (state, action: PayloadAction<TOffer | TOfferExtended | null>) => {
-    //   state.currentOffer = action.payload;
-    // },
     loadMyQuests: (state, action: PayloadAction<TMyBooking[]>) => {
       state.myQuests = action.payload;
+    },
+    // Экшены для изменения фильтров
+    changeType: (state, action: PayloadAction<string>) => {
+      state.currentType = action.payload;
+    },
+    changeLevel: (state, action: PayloadAction<string>) => {
+      state.currentLevel = action.payload;
     },
   },
   extraReducers(builder) {
@@ -95,5 +103,7 @@ export const {
   clearBookingLocations,
   // changeCurrentOffer,
   loadMyQuests,
-  clearCurrentQuest
+  clearCurrentQuest,
+  changeType,
+  changeLevel
 } = dataProcess.actions;

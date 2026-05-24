@@ -1,11 +1,10 @@
 import QuestsCardList from '../../components/quest-card/quest-card-list';
 import { useAppSelector } from '../../hooks';
-import { getQuests } from '../../store/data-process/data-process.selectors';
-import { TQuest } from '../../types';
+import { getFilteredQuests } from '../../store/data-process/data-process.selectors';
 import FilterForm from './components/filter-form';
 
 const MainPage = ():JSX.Element => {
-  const quests: TQuest[] = useAppSelector(getQuests);
+  const filteredQuests = useAppSelector(getFilteredQuests);
   return (
     <main className="page-content">
       <div className="container">
@@ -19,7 +18,7 @@ const MainPage = ():JSX.Element => {
         </div>
         <h2 className="title visually-hidden">Выберите квест</h2>
         <QuestsCardList
-          quests = {quests}
+          quests = {filteredQuests}
         />
       </div>
     </main>

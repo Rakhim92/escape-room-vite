@@ -51,7 +51,7 @@ const GENRE = [
     icon: '#icon-all-quests'
   },
   {
-    title: 'adventure',
+    title: 'adventures',
     description: 'Приключения',
     icon: '#icon-adventure'
   },
