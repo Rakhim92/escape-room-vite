@@ -21,7 +21,7 @@ export const fetchExtendedQuestAction = createAsyncThunk<TExtendedQuest, string,
 
 export const postBookingAction = createAsyncThunk<
   void, // Экшен ничего не возвращает в редьюсер, так как мы сразу уходим на другую страницу
-  { questId: string; bookingData: TBookingPostData }, // Принимает объект с ID квеста и данными формы
+  { questId: string; bookingData: TBookingPostData },
   {
     dispatch: AppDispatch;
     state: State;
