@@ -1,4 +1,4 @@
-import { FormEvent, ReactElement, useEffect, useRef, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getBookingLocations, getIsDataLoading, getQuests } from '../../store/data-process/data-process.selectors';
@@ -9,6 +9,17 @@ import { AppRoute } from '../../const';
 import Map from '../../components/map/map';
 import NotFoundPage from '../not-found-page/not-found-page';
 import LoadingScreen from '../../components/loading-screen/loading-screen';
+import { useForm } from 'react-hook-form';
+import { TBookingPostData } from '../../types';
+
+type BookingFormData = {
+  date: string;// Значение формата "today-14:00" или "tomorrow-17:30"
+  name: string;
+  tel: string;
+  person: number;
+  children: boolean;
+  'user-agreement': boolean;
+};
 
 const BookingPage = (): ReactElement => {
   const {id} = useParams<{ id: string }>();
@@ -17,23 +28,33 @@ const BookingPage = (): ReactElement => {
 
   // Получаем данные из глобального хранилища
   const quests = useAppSelector(getQuests);
-
   const bookingLocations = useAppSelector(getBookingLocations);
   const isDataLoading = useAppSelector(getIsDataLoading);
 
-  // Локальное состояние для отслеживания отправки формы на сервер
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-  const selectedQuest = quests.find((item) => item.id === id);
-
   // Стейт для активного филиала квеста
   const [activeLocationId, setActiveLocationId] = useState<string>('');
-  const [selectedSlot, setSelectedSlot] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const handleLocationChange = (locationId: string) => {
+    // Запрещаем менять локацию во время отправки формы
+    if (isSubmitting) {
+      return;
+    }
+    setActiveLocationId(locationId);
+  };
 
-  const nameRef = useRef<HTMLInputElement>(null);
-  const phoneRef = useRef<HTMLInputElement>(null);
-  const peopleCountRef = useRef<HTMLInputElement>(null);
-  const childrenRef = useRef<HTMLInputElement>(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<BookingFormData>({
+    mode: 'onTouched',
+    defaultValues: {
+      date: '',
+      children: false,
+    }
+  });
+
+  const selectedQuest = quests.find((item) => item.id === id);
 
   // Загружаем локации при открытии страницы и очищаем при закрытии
   useEffect(() => {
@@ -52,16 +73,6 @@ const BookingPage = (): ReactElement => {
     }
   }, [bookingLocations, activeLocationId]);
 
-  // Сбрасываем выбранное время при переключении адреса
-  const handleLocationChange = (locationId: string) => {
-    // Запрещаем менять локацию во время отправки формы
-    if (isSubmitting) {
-      return;
-    }
-    setActiveLocationId(locationId);
-    setSelectedSlot('');
-  };
-
   if (isDataLoading || (bookingLocations.length > 0 && !activeLocationId)) {
     return <LoadingScreen />;
   }
@@ -75,49 +86,41 @@ const BookingPage = (): ReactElement => {
   const { title, previewImg: coverImg, previewImgWebp: coverImgWebp, peopleMinMax } = selectedQuest;
   const [minPeople, maxPeople] = peopleMinMax;
 
-  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
+  const onSubmit = (data: BookingFormData): void => {
+    const [dateType, time] = data.date.split('-') as ['today' | 'tomorrow', string];
 
-    if (!selectedSlot) {
-      toast.error('Пожалуйста, выберите дату и время квеста');
+    if (!dateType || !time) {
+      toast.warn('Пожалуйста, выберите дату и время квеста');
       return;
     }
 
-    const [bookingDate, bookingTime] = selectedSlot.split('-');
-
-    if (nameRef.current && phoneRef.current && peopleCountRef.current) {
-      const peopleCount = Number(peopleCountRef.current.value);
-
-      if (peopleCount < minPeople || peopleCount > maxPeople) {
-        toast.error(`Количество участников должно быть от ${minPeople} до ${maxPeople} чел.`);
-        return;
-      }
-
-      setIsSubmitting(true);
-
-      dispatch(postBookingAction({
-        questId: selectedQuest.id,
-        bookingData: {
-          date: bookingDate as 'today' | 'tomorrow',
-          time: bookingTime,
-          contactPerson: nameRef.current.value.trim(),
-          phone: phoneRef.current.value.trim(),
-          withChildren: childrenRef.current?.checked || false,
-          peopleCount: peopleCount,
-          placeId: activeLocationId,
-        }
-      }))
-        .unwrap() // Позволяет поймать ошибку Thunk, если запрос упадет
-        .then(() => {
-          // Срабатывает ТОЛЬКО при успешном ответе сервера (status 201/200)
-          toast.success('Квест успешно забронирован!');
-          navigate(AppRoute.MyQuests); // Гарантированный редирект силами React Router
-        })
-        .catch(() => {
-          // Если сервер вернул ошибку, разблокируем форму для исправления данных
-          setIsSubmitting(false);
-        });
+    if (!id) {
+      toast.error('Ошибка: Квест не найден');
+      return;
     }
+
+    const bookingData: TBookingPostData = {
+      date: dateType,
+      time: time,
+      contactPerson: data.name,
+      phone: data.tel,
+      peopleCount: Number(data.person),
+      withChildren: data.children,
+      placeId: activeLocationId
+    };
+
+    setIsSubmitting(true);
+
+    dispatch(postBookingAction({ questId: id, bookingData }))
+      .unwrap()
+      .then(() => {
+        toast.success('Квест успешно забронирован!');
+        navigate(AppRoute.MyQuests);
+      })
+      .catch(() => {
+        toast.error('Не удалось отправить бронирование. Попробуйте снова.');
+        setIsSubmitting(false);
+      });
   };
 
   return (
@@ -153,7 +156,10 @@ const BookingPage = (): ReactElement => {
         </div>
         <form
           className="booking-form"
-          onSubmit={handleSubmit}
+          onSubmit={(evt) => {
+            void handleSubmit(onSubmit)(evt);
+          }}
+          noValidate
         >
           <fieldset className="booking-form__section">
             <legend className="visually-hidden">Выбор даты и времени</legend>
@@ -167,11 +173,9 @@ const BookingPage = (): ReactElement => {
                     <label className="custom-radio booking-form__date" key={`today-${slot.time}`}>
                       <input
                         type="radio"
-                        name="date"
                         value={slotValue}
-                        checked={selectedSlot === slotValue}
                         disabled={!slot.isAvailable}
-                        onChange={(e) => setSelectedSlot(e.target.value)}
+                        {...register('date', { required: 'Выберите время квеста' })}
                       />
                       <span className="custom-radio__label">{slot.time}</span>
                     </label>
@@ -189,11 +193,9 @@ const BookingPage = (): ReactElement => {
                     <label className="custom-radio booking-form__date" key={slotValue}>
                       <input
                         type="radio"
-                        name="date"
                         value={slotValue}
-                        checked={selectedSlot === slotValue}
                         disabled={!slot.isAvailable}
-                        onChange={(e) => setSelectedSlot(e.target.value)}
+                        {...register('date', { required: 'Выберите время квеста' })}
                       />
                       <span className="custom-radio__label">{slot.time}</span>
                     </label>
@@ -201,6 +203,7 @@ const BookingPage = (): ReactElement => {
                 })}
               </div>
             </fieldset>
+            {errors.date && <p className="custom-input__error" style={{ color: '#e25151', marginTop: '10px' }}>{errors.date.message}</p>}
           </fieldset>
 
           <fieldset className="booking-form__section">
@@ -210,42 +213,55 @@ const BookingPage = (): ReactElement => {
               <input
                 type="text"
                 id="name"
-                name="name"
                 placeholder="Имя"
-                pattern="[А-Яа-яЁёA-Za-z'-\- ]{1,}"
-                ref={nameRef}
-                required
+                {...register('name', {
+                  required: 'Поле обязательно для заполнения',
+                  minLength: { value: 1, message: 'Имя должно содержать минимум 1 символ' },
+                  maxLength: { value: 15, message: 'Максимум 15 символов' },
+                })}
               />
+              {errors.name && <p className="custom-input__error" style={{ color: '#e25151' }}>{errors.name.message}</p>}
             </div>
             <div className="custom-input booking-form__input">
               <label className="custom-input__label" htmlFor="tel">Контактный телефон</label>
               <input
                 type="tel"
                 id="tel"
-                name="tel"
                 placeholder="Телефон"
-                pattern="[0-9]{10,}"
-                ref={phoneRef}
-                required
+                {...register('tel', {
+                  required: 'Поле обязательно для заполнения',
+                  pattern: {
+                    value: /^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$/,
+                    message: 'Формат телефона должен быть +7 (000) 000-00-00',
+                  },
+                })}
               />
+              {errors.tel && <p className="custom-input__error" style={{ color: '#e25151' }}>{errors.tel.message}</p>}
             </div>
             <div className="custom-input booking-form__input">
               <label className="custom-input__label" htmlFor="person">Количество участников</label>
               <input
                 type="number"
                 id="person"
-                name="person"
                 placeholder="Количество участников"
-                ref={peopleCountRef}
-                required
+                {...register('person', {
+                  required: 'Укажите число участников',
+                  min: {
+                    value: minPeople,
+                    message: `Минимум участников для этого квеста: ${minPeople}`,
+                  },
+                  max: {
+                    value: maxPeople,
+                    message: `Максимум участников для этого квеста: ${maxPeople}`,
+                  },
+                })}
               />
             </div>
             <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--children">
               <input
                 type="checkbox"
                 id="children"
-                name="children"
-                ref={childrenRef}
+                {...register('children')}
               />
               <span className="custom-checkbox__icon">
                 <svg width="20" height="17" aria-hidden="true">
@@ -260,8 +276,7 @@ const BookingPage = (): ReactElement => {
             <input
               type="checkbox"
               id="id-order-agreement"
-              name="user-agreement"
-              required
+              {...register('user-agreement', { required: 'Необходимо согласие с правилами' })}
             />
             <span className="custom-checkbox__icon">
               <svg width="20" height="17" aria-hidden="true">

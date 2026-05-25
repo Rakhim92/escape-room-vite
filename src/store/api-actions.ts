@@ -1,21 +1,11 @@
 import { AxiosInstance } from 'axios';
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { TQuest, UserData, AuthData, AppDispatch, State, TMyBooking, TBookingLocation, TExtendedQuest } from '../types.ts';
+import { TQuest, UserData, AuthData, AppDispatch, State, TMyBooking, TBookingLocation, TExtendedQuest, TBookingPostData } from '../types.ts';
 import { redirectToRoute } from './action';
 import { requireAuthorization, saveAuthInfo } from './user-process/user-process.ts';
 import { loadMyQuests, loadQuests, setLoadingStatus } from './data-process/data-process.ts';
 import { saveToken, dropToken, getToken } from '../services/token';
 import { APIRoute, AuthorizationStatus, AppRoute, USER_AUTH_DATA } from '../const';
-
-export type TBookingPostData = {
-  date: 'today' | 'tomorrow';
-  time: string;
-  contactPerson: string;
-  phone: string;
-  withChildren: boolean;
-  peopleCount: number;
-  placeId: string;
-};
 
 export const fetchExtendedQuestAction = createAsyncThunk<TExtendedQuest, string, {
   dispatch: AppDispatch;

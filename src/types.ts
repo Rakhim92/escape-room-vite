@@ -4,6 +4,16 @@ export type State = ReturnType<typeof store.getState>;
 
 export type AppDispatch = typeof store.dispatch;
 
+export type TBookingPostData = {
+  date: 'today' | 'tomorrow';
+  time: string;
+  contactPerson: string;
+  phone: string;
+  withChildren: boolean;
+  peopleCount: number;
+  placeId: string;
+};
+
 export type TDataProcess = {
   quests: TQuest[];
   isDataLoading: boolean;
