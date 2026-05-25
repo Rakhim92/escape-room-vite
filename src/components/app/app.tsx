@@ -1,13 +1,13 @@
-import {BrowserRouter, Route, Routes} from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 // import browserHistory from '../../browser-history';
-import {AppRoute, AuthorizationStatus} from '../../const';
+import { AppRoute, AuthorizationStatus } from '../../const';
 import Layout from '../layout/layout';
 import MainPage from '../../pages/main-page/main-page';
 import QuestPage from '../../pages/quest-page/quest-page';
 import ContactsPage from '../../pages/contacts-page/contacts-page';
 import LoginPage from '../../pages/login-page/login-page';
 import BookingPage from '../../pages/booking-page/booking-page';
-import MyQuests from '../../pages/my-quests/my-quests';
+import MyQuestsPage from '../../pages/my-quests-page/my-quests-page';
 import PrivateRoute from '../private-route/private-route';
 import PublicRoute from '../public-route/public-route';
 import NotFoundPage from '../../pages/not-found-page/not-found-page';
@@ -81,7 +81,7 @@ const App = () => {
             path={AppRoute.MyQuests}
             element={
               <PrivateRoute authorizationStatus={authorizationStatus}>
-                <MyQuests/>
+                <MyQuestsPage/>
               </PrivateRoute>
             }
           />

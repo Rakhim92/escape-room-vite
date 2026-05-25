@@ -1,16 +1,15 @@
-import {Link, NavLink, Outlet} from 'react-router-dom';
-import {AppRoute, AuthorizationStatus} from '../../const';
+import { Link, NavLink, Outlet } from 'react-router-dom';
+import { AppRoute, AuthorizationStatus } from '../../const';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getAuthorizationStatus} from '../../store/user-process/user-process.selectors';
-import { logoutAction } from '../../store/api-actions'; // Импортируем созданный ранее экшен логаута
+import { logoutAction } from '../../store/api-actions';
 import { MouseEvent } from 'react';
 
 const Layout = () => {
-  const dispatch = useAppDispatch(); // Инициализируем dispatch
+  const dispatch = useAppDispatch();
   const authorizationStatus = useAppSelector(getAuthorizationStatus);
   const isAuthorizated = authorizationStatus === AuthorizationStatus.Auth;
 
-  // Функция для обработки клика по кнопке Выйти
   const handleLogoutClick = (evt: MouseEvent<HTMLAnchorElement>) => {
     evt.preventDefault();
     dispatch(logoutAction());
@@ -58,7 +57,6 @@ const Layout = () => {
           </nav>
           <div className="header__side-nav">
             {isAuthorizated ? (
-              // Кнопка для авторизованного пользователя вызывает логаут
               <a
                 className="btn header__side-item btn--accent"
                 href="#"
@@ -67,7 +65,6 @@ const Layout = () => {
                 Выйти
               </a>
             ) : (
-              // Кнопка для гостя ведет на страницу логина (укажите ваш роут, например AppRoute.Login)
               <Link
                 className="btn header__side-item header__login-btn"
                 to={AppRoute.Login || '/login'}
@@ -107,7 +104,8 @@ const Layout = () => {
               <li className="socials__item">
                 <a
                   className="socials__link"
-                  href="#" aria-label="ВКонтакте"
+                  href="#"
+                  aria-label="ВКонтакте"
                   target="_blank"
                   rel="nofollow noopener noreferrer"
                 >

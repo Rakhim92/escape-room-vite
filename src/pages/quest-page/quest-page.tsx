@@ -1,6 +1,4 @@
 import { Link, useParams } from 'react-router-dom';
-// import { TExtendedQuest } from '../../types';
-import NotFoundPage from '../not-found-page/not-found-page';
 import { AppRoute } from '../../const';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks';
@@ -8,10 +6,7 @@ import { getCurrentQuest, getIsDataLoading } from '../../store/data-process/data
 import { fetchExtendedQuestAction } from '../../store/api-actions';
 import { clearCurrentQuest } from '../../store/data-process/data-process';
 import LoadingScreen from '../../components/loading-screen/loading-screen';
-
-// type TQuestsPage = {
-//   extendedQuests: readonly TExtendedQuest[];
-// }
+import NotFoundPage from '../not-found-page/not-found-page';
 
 const LevelLabel = {
   easy: 'Лёгкий',

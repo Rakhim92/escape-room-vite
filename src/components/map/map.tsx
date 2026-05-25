@@ -1,5 +1,5 @@
-import {useRef, useEffect} from 'react';
-import {Icon, Marker, layerGroup} from 'leaflet';
+import { useRef, useEffect } from 'react';
+import { Icon, Marker, layerGroup } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import useMap from './use-map';
 import { TBookingLocation, TCompanyLocation } from '../../types';
@@ -52,7 +52,6 @@ function Map(props: MapProps): JSX.Element {
         marker
           .setIcon(isCurrent ? currentCustomIcon : defaultCustomIcon)
           .addTo(markerLayer);
-        // Исправлено: навешиваем обработчик клика на маркер
         if (onLocationChange) {
           marker.on('click', () => {
             onLocationChange(location.id);

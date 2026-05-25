@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import { AppRoute } from '../../const';
-import QuestsCardList from '../../components/quest-card/quest-card-list';
-import LoadingScreen from '../../components/loading-screen/loading-screen';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getIsDataLoading, getMyQuests } from '../../store/data-process/data-process.selectors';
-import { useEffect } from 'react';
 import { fetchMyQuestsAction } from '../../store/api-actions';
+import QuestsCardList from '../../components/quest-card/quest-card-list';
+import LoadingScreen from '../../components/loading-screen/loading-screen';
 
-const MyQuests = ():JSX.Element => {
+const MyQuestsPage = ():JSX.Element => {
   const dispatch = useAppDispatch();
   const myBookingsData = useAppSelector(getMyQuests);
   const isDataLoading = useAppSelector(getIsDataLoading);
@@ -53,4 +53,4 @@ const MyQuests = ():JSX.Element => {
   );
 };
 
-export default MyQuests;
+export default MyQuestsPage;

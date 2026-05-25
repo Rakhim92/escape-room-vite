@@ -32,5 +32,4 @@ export const userProcess = createSlice({
   },
 });
 
-// Автоматически сгенерированные экшены
 export const { requireAuthorization, saveAuthInfo } = userProcess.actions;

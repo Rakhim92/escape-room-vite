@@ -30,10 +30,7 @@ export const createAPI = (): AxiosInstance => {
     (config: InternalAxiosRequestConfig) => {
       config.headers = config.headers || {};
       const token = getToken();
-      if (token && config.headers) {
-        config.headers['x-token'] = token;
-      }
-
+      config.headers['x-token'] = token;
       return config;
     },
   );

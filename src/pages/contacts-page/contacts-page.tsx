@@ -1,12 +1,11 @@
 import { ReactElement} from 'react';
-import Map from '../../components/map/map';
 import { COMPANY_LOCATION } from '../../const';
+import Map from '../../components/map/map';
 
 const ContactsPage = (): ReactElement => (
   <main className="page-content decorated-page">
     <div className="decorated-page__decor" aria-hidden="true">
       <picture>
-        {/* ИСПРАВЛЕНО: Убраны точки из путей, сделаны абсолютные ссылки от корня сайта */}
         <source
           type="image/webp"
           srcSet="/img/content/maniac/maniac-bg-size-m.webp, /img/content/maniac/maniac-bg-size-m@2x.webp 2x"

@@ -9,7 +9,6 @@ type TFilter = {
   icon?: string;
 };
 
-// Базовые пропсы для интерактивности
 type TBaseFilterProps = {
   title: string;
   description: string;
@@ -30,8 +29,8 @@ const GenreItem = ({ title, description, icon, activeValue, onChange }: GenreIte
       type="radio"
       name="type"
       id={title}
-      checked={activeValue === title} // Контролируемое состояние
-      onChange={() => onChange(title)} // Отправка экшена при изменении
+      checked={activeValue === title}
+      onChange={() => onChange(title)}
     />
     <label className="filter__label" htmlFor={title}>
       <svg className="filter__icon" width="26" height="30" aria-hidden="true">
@@ -49,8 +48,8 @@ const LevelItem = ({ title, description, activeValue, onChange }: LevelItemProps
       type="radio"
       name="level"
       id={title}
-      checked={activeValue === title} // Контролируемое состояние
-      onChange={() => onChange(title)} // Отправка экшена при изменении
+      checked={activeValue === title}
+      onChange={() => onChange(title)}
     />
     <label className="filter__label" htmlFor={title}>
       <span className="filter__label-text">{description}</span>
@@ -60,7 +59,6 @@ const LevelItem = ({ title, description, activeValue, onChange }: LevelItemProps
 
 const FilterForm = (): JSX.Element => {
   const dispatch = useAppDispatch();
-  // Получаем текущие активные фильтры из Redux
   const currentType = useAppSelector(getCurrentType);
   const currentLevel = useAppSelector(getCurrentLevel);
 
@@ -84,8 +82,8 @@ const FilterForm = (): JSX.Element => {
               title={item.title}
               description={item.description}
               icon={item.icon}
-              activeValue={currentType} // Передаем активный тип из Redux
-              onChange={handleTypeChange} // Передаем функцию изменения
+              activeValue={currentType}
+              onChange={handleTypeChange}
             />
           ))}
         </ul>
@@ -98,8 +96,8 @@ const FilterForm = (): JSX.Element => {
               key={item.title}
               title={item.title}
               description={item.description}
-              activeValue={currentLevel} // Передаем активную сложность из Redux
-              onChange={handleLevelChange} // Передаем функцию изменения
+              activeValue={currentLevel}
+              onChange={handleLevelChange}
             />
           ))}
         </ul>

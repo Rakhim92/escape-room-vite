@@ -1,7 +1,7 @@
-import QuestsCardList from '../../components/quest-card/quest-card-list';
 import { useAppSelector } from '../../hooks';
 import { getFilteredQuests } from '../../store/data-process/data-process.selectors';
 import FilterForm from './components/filter-form';
+import QuestsCardList from '../../components/quest-card/quest-card-list';
 
 const MainPage = ():JSX.Element => {
   const filteredQuests = useAppSelector(getFilteredQuests);

@@ -4,11 +4,10 @@ import { AuthorizationStatus } from '../../const';
 import { requireAuthorization } from '../user-process/user-process';
 import { deleteBookingAction, fetchBookingLocationsAction, fetchExtendedQuestAction } from '../api-actions';
 
-// Создаем чистый мутабельный тип специально для Redux State
 type TMutableBooking = Omit<TMyBooking, 'location'> & {
   location: {
     address: string;
-    coords: number[]; // убираем жесткий кортеж [number, number], который ломает Immer
+    coords: number[];
   };
 }
 
@@ -18,8 +17,8 @@ type TDataProcess = {
   myQuests: TMutableBooking[];
   bookingLocations: TBookingLocation[];
   currentQuest: TExtendedQuest | null;
-  currentType: string; // по умолчанию 'all'
-  currentLevel: string; // по умолчанию 'any'
+  currentType: string;
+  currentLevel: string;
 };
 
 const initialState: TDataProcess = {
@@ -28,7 +27,7 @@ const initialState: TDataProcess = {
   myQuests: [],
   bookingLocations: [],
   currentQuest: null,
-  currentType: 'all', // 'all' означает, что фильтр не выбран
+  currentType: 'all',
   currentLevel: 'any',
 };
 
@@ -102,13 +101,11 @@ export const dataProcess = createSlice({
   }
 });
 
-// Автоматически сгенерированные экшены
 export const {
   changeQuests,
   loadQuests,
   setLoadingStatus,
   clearBookingLocations,
-  // changeCurrentOffer,
   loadMyQuests,
   clearCurrentQuest,
   changeType,

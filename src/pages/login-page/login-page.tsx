@@ -4,7 +4,6 @@ import { loginAction } from '../../store/api-actions';
 
 const LoginPage = ():JSX.Element => {
   const dispatch = useAppDispatch();
-  // Используем рефы для быстрого извлечения значений без лишних перерендеров
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -15,7 +14,6 @@ const LoginPage = ():JSX.Element => {
       const email = emailRef.current.value.trim();
       const password = passwordRef.current.value.trim();
 
-      // Простая валидация на заполненность полей перед отправкой
       if (email && password) {
         dispatch(loginAction({
           login: email,

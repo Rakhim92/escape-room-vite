@@ -1,24 +1,16 @@
 import { FormEvent, ReactElement, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-// import { TBookingLocation, TExtendedQuest } from '../../types';
-import Map from '../../components/map/map';
-import NotFoundPage from '../not-found-page/not-found-page';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getBookingLocations, getIsDataLoading, getQuests } from '../../store/data-process/data-process.selectors';
 import { fetchBookingLocationsAction, postBookingAction } from '../../store/api-actions';
 import { clearBookingLocations } from '../../store/data-process/data-process';
-import LoadingScreen from '../../components/loading-screen/loading-screen';
 import { toast } from 'react-toastify';
 import { AppRoute } from '../../const';
-
-// type TBookingPageProps = {
-//   extendedQuests: TExtendedQuest[];
-//   bookingLocations: TBookingLocation[];
-// };
+import Map from '../../components/map/map';
+import NotFoundPage from '../not-found-page/not-found-page';
+import LoadingScreen from '../../components/loading-screen/loading-screen';
 
 const BookingPage = (): ReactElement => {
-  // Локальное состояние для отслеживания отправки формы на сервер
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const {id} = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -27,6 +19,9 @@ const BookingPage = (): ReactElement => {
   const quests = useAppSelector(getQuests);
   const bookingLocations = useAppSelector(getBookingLocations);
   const isDataLoading = useAppSelector(getIsDataLoading);
+
+  // Локальное состояние для отслеживания отправки формы на сервер
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const selectedQuest = quests.find((item) => item.id === id);
 

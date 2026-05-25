@@ -22,14 +22,12 @@ const TodayTomorrowTranslate = {
 
 const QuestCard = ({quest}: TQuestCard):JSX.Element => {
   const dispatch = useAppDispatch(); // Инициализируем dispatch
-  // Проверяем, вложенный ли это квест (из TMyBooking) или прямой (из TQuest)
   const questData = isMyBooking(quest) ? quest.quest : quest;
   const { title, previewImg, previewImgWebp, level, peopleMinMax, id } = questData;
   const [minPeople, maxPeople] = peopleMinMax;
-  // Обработчик удаления бронирования
+
   const handleDeleteClick = () => {
     if (isMyBooking(quest)) {
-      // Передаем quest.id (это ID самой брони из TMyBooking)
       dispatch(deleteBookingAction(quest.id));
     }
   };
