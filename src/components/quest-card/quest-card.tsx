@@ -25,7 +25,6 @@ const QuestCard = ({quest}: TQuestCard):JSX.Element => {
   const questData = isMyBooking(quest) ? quest.quest : quest;
   const { title, previewImg, previewImgWebp, level, peopleMinMax, id } = questData;
   const [minPeople, maxPeople] = peopleMinMax;
-
   const handleDeleteClick = () => {
     if (isMyBooking(quest)) {
       dispatch(deleteBookingAction(quest.id));
@@ -69,11 +68,19 @@ const QuestCard = ({quest}: TQuestCard):JSX.Element => {
           )}
         </div>
         <ul className="tags quest-card__tags">
-          <li className="tags__item">
-            <svg width="11" height="14" aria-hidden="true">
-              <use xlinkHref="#icon-person"/>
-            </svg>{minPeople}&ndash;{maxPeople}&nbsp;чел
-          </li>
+          {isMyBooking(quest) ? (
+            <li className="tags__item">
+              <svg width="11" height="14" aria-hidden="true">
+                <use xlinkHref="#icon-person"/>
+              </svg>{quest.peopleCount}&nbsp;чел
+            </li>
+          ) : (
+            <li className="tags__item">
+              <svg width="11" height="14" aria-hidden="true">
+                <use xlinkHref="#icon-person"/>
+              </svg>{minPeople}&ndash;{maxPeople}&nbsp;чел
+            </li>
+          )}
           <li className="tags__item">
             <svg width="14" height="14" aria-hidden="true">
               <use xlinkHref="#icon-level"/>

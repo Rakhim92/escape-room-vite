@@ -1,6 +1,7 @@
 import { FormEvent, useRef } from 'react';
 import { useAppDispatch } from '../../hooks';
 import { loginAction } from '../../store/api-actions';
+import { toast } from 'react-toastify';
 
 const LoginPage = ():JSX.Element => {
   const dispatch = useAppDispatch();
@@ -12,7 +13,14 @@ const LoginPage = ():JSX.Element => {
 
     if (emailRef.current && passwordRef.current) {
       const email = emailRef.current.value.trim();
-      const password = passwordRef.current.value.trim();
+      const password = passwordRef.current.value;
+      // Регулярное выражение: минимум 1 буква, минимум 1 цифра, длина от 3 до 15 символов
+      const passwordRegex = /^(?=.*[A-Za-zА-Яа-яЁё])(?=.*\d).{3,15}$/;
+
+      if (!passwordRegex.test(password)) {
+        toast.warn('Пароль должен содержать от 3 до 15 символов, включая минимум одну букву и одну цифру!');
+        return; // Блокируем отправку формы
+      }
 
       if (email && password) {
         dispatch(loginAction({
@@ -65,8 +73,8 @@ const LoginPage = ():JSX.Element => {
                     id="password"
                     name="password"
                     placeholder="Пароль"
-                    pattern="^(?=.*[A-Za-zА-Яа-я])(?=.*\d)\S+$"
-                    title="Пароль должен содержать минимум одну букву и одну цифры без пробелов"
+                    minLength={3}
+                    maxLength={15}
                     required
                   />
                 </div>

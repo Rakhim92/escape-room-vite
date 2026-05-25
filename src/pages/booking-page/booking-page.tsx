@@ -17,6 +17,7 @@ const BookingPage = (): ReactElement => {
 
   // Получаем данные из глобального хранилища
   const quests = useAppSelector(getQuests);
+
   const bookingLocations = useAppSelector(getBookingLocations);
   const isDataLoading = useAppSelector(getIsDataLoading);
 
