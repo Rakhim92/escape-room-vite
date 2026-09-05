@@ -4,15 +4,18 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// Передаем объект { command }, который Vite заполняет автоматически
+// ИСПРАВЛЕНО: Перевели конфигурацию на функцию, принимающую аргумент command
 export default defineConfig(({ command }) => ({
   plugins: [react()],
+
+  // Если выполняется сборка (build), жестко привязываем имя репозитория,
+  // во всех остальных случаях (локальный старт) — корень '/'
+  base: command === 'build' ? '/escape-room-vite/' : '/',
+
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
   },
-  // Если выполняется команда сборки (build), жестко ставим подпапку репозитория.
-  // Во всех остальных случаях (например, npm run start) — обычный корень '/'
-  base: command === 'build' ? '/escape-room-vite/' : '/',
 }));
+
