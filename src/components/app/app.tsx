@@ -18,6 +18,9 @@ import { useEffect } from 'react';
 import { getIsDataLoading, getQuests } from '../../store/data-process/data-process.selectors';
 import LoadingScreen from '../loading-screen/loading-screen';
 
+// Определяем базовый путь в зависимости от окружения
+const basename = process.env.NODE_ENV === 'production' ? '/escape-room-vite' : '/';
+
 const App = () => {
   const quests = useAppSelector(getQuests);
   const authorizationStatus = useAppSelector(getAuthorizationStatus);
@@ -38,7 +41,7 @@ const App = () => {
   }
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <Routes>
         <Route
           path={AppRoute.Root}

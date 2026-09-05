@@ -39,12 +39,12 @@ const QuestCard = ({quest}: TQuestCard):JSX.Element => {
           <picture>
             <source
               type="image/webp"
-              srcSet={`${previewImgWebp},
-              ${previewImgWebp}@2x.webp 2x`}
+              /* Флаг /i заменит расширение, даже если оно написано заглавными буквами (.WEBP) */
+              srcSet={`${previewImgWebp}, ${previewImgWebp.replace(/\.webp$/i, '@2x.webp')} 2x`}
             />
             <img
               src={previewImg}
-              srcSet={`${previewImg}@2x.jpg 2x`}
+              srcSet={`${previewImg}, ${previewImg.replace(/\.jpg$/i, '@2x.jpg')} 2x`}
               width="344"
               height="232"
               alt={`Превью квеста ${title}`}
