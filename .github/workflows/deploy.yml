@@ -34,7 +34,7 @@ jobs:
         run: npm ci
 
       - name: Build project
-        run: npm run build
+        run: npm run build -- --base=/escape-room-vite/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
