@@ -34,7 +34,8 @@ jobs:
         run: npm ci
 
       - name: Build project
-        run: npm run build -- --base=/escape-room-vite/
+        # Вызываем компилятор типов и сборщик Vite напрямую, чтобы флаг сработал на 100%
+        run: npx tsc && npx vite build --base=/escape-room-vite/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
